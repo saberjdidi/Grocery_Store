@@ -8,6 +8,7 @@
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/activity_details_product.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/activity_login.xml" value="0.2957427536231884" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/activity_main.xml" value="0.2957427536231884" />
+        <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/activity_nav_category.xml" value="0.26927083333333335" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/activity_registration.xml" value="0.2957427536231884" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/activity_view_all.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/activity_welcome.xml" value="0.22" />
@@ -23,6 +24,7 @@
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/home_cat_item.xml" value="0.31927083333333334" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/my_cart_item.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/nav_cat_item.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/nav_category_detailed_item.xml" value="0.26927083333333335" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/nav_header_main.xml" value="0.2957427536231884" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/popular_item.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/recommended_item.xml" value="0.36666666666666664" />

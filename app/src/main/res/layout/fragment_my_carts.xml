@@ -44,12 +44,12 @@
         android:layout_height="match_parent"
         android:id="@+id/constraint2">
         <TextView
-            android:id="@+id/price"
+            android:id="@+id/total_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/purple_700"
             android:fontFamily="@font/alice"
-            android:text="Total Price : 300"
+            android:text="Total Price : 0$"
             android:padding="10dp"
             android:textAlignment="center"
             android:textColor="@color/white"
@@ -69,7 +69,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.461"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/price"
+            app:layout_constraintTop_toBottomOf="@+id/total_amount"
             app:layout_constraintVertical_bias="0" />
 
         <androidx.appcompat.widget.AppCompatButton
