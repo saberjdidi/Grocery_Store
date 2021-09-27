@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,6 +34,7 @@ public class ViewAllActivity extends AppCompatActivity {
     ViewAllAdapter adapter;
     List<ViewAllModel> list;
     Toolbar toolbar;
+    ProgressBar progressBar;
 
     FirebaseFirestore db;
 
@@ -49,9 +51,12 @@ public class ViewAllActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        progressBar = findViewById(R.id.progressbar);
         recyclerView = findViewById(R.id.view_all_rec);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
         list = new ArrayList<>();
 
         type = getIntent().getStringExtra("type");
@@ -60,6 +65,7 @@ public class ViewAllActivity extends AppCompatActivity {
     }
 
     private void getData() {
+
         adapter = new ViewAllAdapter(this, list);
         recyclerView.setAdapter(adapter);
 
@@ -76,10 +82,14 @@ public class ViewAllActivity extends AppCompatActivity {
                                     list.add(model);
                                     adapter.notifyDataSetChanged();
 
+                                    progressBar.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
                                 }
                             } else {
                                 Toast.makeText(ViewAllActivity.this, "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                                 Log.w("TAG", "Error getting documents.", task.getException());
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -98,10 +108,14 @@ public class ViewAllActivity extends AppCompatActivity {
                                     list.add(model);
                                     adapter.notifyDataSetChanged();
 
+                                    progressBar.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
                                 }
                             } else {
                                 Toast.makeText(ViewAllActivity.this, "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                                 Log.w("TAG", "Error getting documents.", task.getException());
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -120,10 +134,14 @@ public class ViewAllActivity extends AppCompatActivity {
                                     list.add(model);
                                     adapter.notifyDataSetChanged();
 
+                                    progressBar.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
                                 }
                             } else {
                                 Toast.makeText(ViewAllActivity.this, "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                                 Log.w("TAG", "Error getting documents.", task.getException());
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -142,10 +160,14 @@ public class ViewAllActivity extends AppCompatActivity {
                                     list.add(model);
                                     adapter.notifyDataSetChanged();
 
+                                    progressBar.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
                                 }
                             } else {
                                 Toast.makeText(ViewAllActivity.this, "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                                 Log.w("TAG", "Error getting documents.", task.getException());
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
                             }
                         }
                     });

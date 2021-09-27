@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ public class CategoryFragment extends Fragment {
     RecyclerView recyclerView;
     List<NavCategoryModel> list;
     NavCategoryAdapter adapter;
+    ProgressBar progressBar;
 
     FirebaseFirestore db;
 
@@ -42,12 +44,17 @@ public class CategoryFragment extends Fragment {
 
         View root = inflater.inflate(R.layout.fragment_category, container, false);
         recyclerView = root.findViewById(R.id.cat_rec);
+        progressBar = root.findViewById(R.id.progressbar);
 
-        loadDataCategories();
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+
+        loadData();
+
         return root;
     }
 
-    private void loadDataCategories() {
+    private void loadData() {
         //Popular items
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
         list = new ArrayList<>();
@@ -62,6 +69,8 @@ public class CategoryFragment extends Fragment {
                                 NavCategoryModel model = document.toObject(NavCategoryModel.class);
                                 list.add(model);
 
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
                             }
 
                             adapter = new NavCategoryAdapter(getActivity(), list);
@@ -70,7 +79,8 @@ public class CategoryFragment extends Fragment {
                         } else {
                             Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                             Log.w("TAG", "Error getting documents.", task.getException());
-
+                            progressBar.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
                         }
                     }
                 });

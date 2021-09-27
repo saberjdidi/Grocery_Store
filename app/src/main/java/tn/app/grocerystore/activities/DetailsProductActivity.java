@@ -133,8 +133,8 @@ public class DetailsProductActivity extends AppCompatActivity {
         cartMap.put("totalPrice", totalPrice);
 
         //add to database
-        firestore.collection("AddToCart").document(auth.getCurrentUser().getUid())
-                .collection("CurrentUser").add(cartMap)
+        firestore.collection("CurrentUser").document(auth.getCurrentUser().getUid())
+                .collection("AddToCart").add(cartMap)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {

@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,6 +33,7 @@ public class NavCategoryActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     List<NavCategoryDetailedModel> list;
     NavCategoryDetailedAdapter adapter;
+    ProgressBar progressBar;
 
     Toolbar toolbar;
     String type;
@@ -42,6 +45,7 @@ public class NavCategoryActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        progressBar = findViewById(R.id.progressbar);
         recyclerView = findViewById(R.id.nav_cat_det_rec);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         list = new ArrayList<>();
@@ -49,6 +53,9 @@ public class NavCategoryActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
 
         type = getIntent().getStringExtra("type");
 
@@ -71,10 +78,14 @@ public class NavCategoryActivity extends AppCompatActivity {
                                     list.add(model);
                                     adapter.notifyDataSetChanged();
 
+                                    progressBar.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
                                 }
                             } else {
                                 Toast.makeText(NavCategoryActivity.this, "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                                 Log.w("TAG", "Error getting documents.", task.getException());
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -92,10 +103,14 @@ public class NavCategoryActivity extends AppCompatActivity {
                                     list.add(model);
                                     adapter.notifyDataSetChanged();
 
+                                    progressBar.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
                                 }
                             } else {
                                 Toast.makeText(NavCategoryActivity.this, "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                                 Log.w("TAG", "Error getting documents.", task.getException());
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
                             }
                         }
                     });

@@ -2,6 +2,7 @@ package tn.app.grocerystore.models;
 
 public class User {
     String name, email, password;
+    String profileImg;
 
     public User() {
     }
@@ -34,5 +35,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getProfileImg() {
+        return profileImg;
+    }
+
+    public void setProfileImg(String profileImg) {
+        this.profileImg = profileImg;
     }
 }
