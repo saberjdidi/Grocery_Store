@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
+       <!-- <ImageView
             android:id="@+id/new_product_img"
             android:layout_width="400dp"
             android:layout_height="300dp"
@@ -33,7 +33,126 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/new_product_img"
-            app:layout_constraintVertical_bias="0.189" />
+            app:layout_constraintVertical_bias="0.189" /> -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/poduct_img"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:src="@mipmap/newproducts"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="20dp"/>
+
+        <EditText
+            android:id="@+id/poduct_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Name"
+            android:padding="13dp"
+            android:inputType="textPersonName"
+            android:elevation="3dp"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintWidth_percent=".8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/poduct_img"
+            app:layout_constraintVertical_bias="0.11" />
+        <EditText
+            android:id="@+id/poduct_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Description"
+            android:padding="13dp"
+            android:elevation="3dp"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintWidth_percent=".8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/poduct_name"
+            app:layout_constraintVertical_bias="0.11" />
+        <EditText
+            android:id="@+id/product_rating"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Rating"
+            android:padding="13dp"
+            android:elevation="3dp"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintWidth_percent=".8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/poduct_description"
+            app:layout_constraintVertical_bias="0.11" />
+       <!-- <EditText
+            android:id="@+id/product_type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Type"
+            android:padding="13dp"
+            android:inputType="textPostalAddress"
+            android:elevation="3dp"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintWidth_percent=".8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/product_rating"
+            app:layout_constraintVertical_bias="0.11" />-->
+        <Spinner
+            android:id="@+id/product_type"
+            android:layout_width="0dp"
+            android:background="@drawable/edittext_bg"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:elevation="3dp"
+            android:textAlignment="center"
+            android:layout_marginTop="20dp"
+            app:layout_constraintWidth_percent=".8"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingLeft="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/product_rating"
+            app:layout_constraintVertical_bias="0.11" />
+        <EditText
+            android:id="@+id/product_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_bg"
+            android:hint="Price"
+            android:padding="13dp"
+            android:inputType="number"
+            android:elevation="3dp"
+            android:drawablePadding="10dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintWidth_percent=".8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/product_type"
+            app:layout_constraintVertical_bias="0.11" />
+
+        <Button
+            android:id="@+id/product_btn"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:padding="14dp"
+            android:text="Save"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/product_price"
+            app:layout_constraintVertical_bias="0.3" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

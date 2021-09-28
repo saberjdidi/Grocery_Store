@@ -3,6 +3,7 @@ package tn.app.grocerystore.ui.profile;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,8 @@ public class ProfileFragment extends Fragment {
     FirebaseAuth auth;
     FirebaseDatabase database;
 
+    Uri image_uri;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -73,6 +76,8 @@ public class ProfileFragment extends Fragment {
                         Glide.with(getContext()).load(user.getProfileImg()).into(profileImg);
                         name.setText(user.getName());
                         email.setText(user.getEmail());
+                        number.setText(user.getNumber());
+                        address.setText(user.getAddress());
                     }
 
                     @Override
@@ -103,17 +108,25 @@ public class ProfileFragment extends Fragment {
 
     private void updateUserProfile() {
 
-       /* HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("name", name);
-        hashMap.put("email", email);
-        //hashMap.put("profileImg", name);
+        String nameEt = name.getText().toString();
+        String emailEt = email.getText().toString();
+        String numberEt = number.getText().toString();
+        String addressEt = address.getText().toString();
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("name", nameEt);
+        hashMap.put("email", emailEt);
+        hashMap.put("profileImg", image_uri.toString());
+        hashMap.put("number", numberEt);
+        hashMap.put("address", addressEt);
         //DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         //reference.child(FirebaseAuth.getInstance().getUid()).updateChildren(hashMap)
-        database.getReference("Users").child(FirebaseAuth.getInstance().getUid()).updateChildren(hashMap)
+        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid()).setValue(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
                         Toast.makeText(getContext(), "User updated", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", "Hash Map "+hashMap);
                     }
                 })
         .addOnFailureListener(new OnFailureListener() {
@@ -121,7 +134,7 @@ public class ProfileFragment extends Fragment {
             public void onFailure(@NonNull Exception e) {
                 Toast.makeText(getContext(), "Error : "+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        }); */
+        });
     }
 
     @Override
@@ -129,13 +142,13 @@ public class ProfileFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(data.getData() != null){
-            Uri profileUri = data.getData();
-            profileImg.setImageURI(profileUri);
+            image_uri = data.getData();
+            profileImg.setImageURI(image_uri);
 
             final StorageReference reference = storage.getReference().child("profile_picture")
                     .child(FirebaseAuth.getInstance().getUid());
 
-            reference.putFile(profileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            reference.putFile(image_uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(getContext(), "Uploaded", Toast.LENGTH_SHORT).show();
@@ -143,9 +156,12 @@ public class ProfileFragment extends Fragment {
                     reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                         database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
+                            image_uri = uri;
+                       /*  database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
                                  .child("profileImg").setValue(uri.toString());
+                            image_uri = uri;
                             Toast.makeText(getContext(), "Profile Picture Uploaded to DB", Toast.LENGTH_SHORT).show();
+                            Log.d("TAG", "Image "+image_uri); */
                         }
                     });
                 }

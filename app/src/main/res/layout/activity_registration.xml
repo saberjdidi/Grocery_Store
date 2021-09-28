@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/reg_img"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="180dp"
         android:src="@mipmap/regbg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -65,6 +65,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/email_reg"
         app:layout_constraintWidth_percent=".8" />
+
+    <EditText
+        android:id="@+id/number_reg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:drawableLeft="@drawable/ic_baseline_local_phone_24"
+        android:layout_marginTop="15dp"
+        android:drawablePadding="10dp"
+        android:textColor="#888887"
+        android:elevation="3dp"
+        android:padding="13dp"
+        android:hint="Phone Number"
+        android:inputType="phone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/password_reg"
+        app:layout_constraintWidth_percent=".8" />
+    <EditText
+        android:id="@+id/address_reg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:drawableLeft="@drawable/ic_baseline_location_on_24"
+        android:layout_marginTop="15dp"
+        android:drawablePadding="10dp"
+        android:textColor="#888887"
+        android:elevation="3dp"
+        android:padding="13dp"
+        android:hint="Address"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/number_reg"
+        app:layout_constraintWidth_percent=".8" />
+
     <Button
         android:layout_width="150dp"
         android:layout_height="wrap_content"
@@ -76,7 +112,7 @@
         android:layout_marginTop="25dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/password_reg"/>
+        app:layout_constraintTop_toBottomOf="@id/address_reg"/>
 
     <TextView
         android:id="@+id/textView2"
