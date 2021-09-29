@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         User user = snapshot.getValue(User.class);
 
-                        Glide.with(MainActivity.this).load(user.getProfileImg()).into(headerImage);
+                        Glide.with(MainActivity.this).load(user.getProfileImg()).placeholder(R.drawable.profile).into(headerImage);
                         headerName.setText(user.getName());
                         headerEmail.setText(user.getEmail());
                     }

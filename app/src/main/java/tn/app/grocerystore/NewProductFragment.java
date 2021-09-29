@@ -77,7 +77,7 @@ public class NewProductFragment extends Fragment {
                 ,android.R.layout.simple_dropdown_item_1line, typeList);
         typeEt.setAdapter(adapterType);
 
-        //get image from camera/gallery
+        //get image from gallery
         productImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

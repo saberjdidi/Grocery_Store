@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import tn.app.grocerystore.activities.PaymentActivity;
 import tn.app.grocerystore.activities.PlacedOrderActivity;
 import tn.app.grocerystore.adapters.MyCartAdapter;
 import tn.app.grocerystore.models.MyCartModel;
@@ -50,6 +51,7 @@ public class MyCartsFragment extends Fragment {
 
     AppCompatButton buyNow;
     int totalBill;
+    double totalAmount = 0.0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -86,8 +88,10 @@ public class MyCartsFragment extends Fragment {
         buyNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), PlacedOrderActivity.class);
+                //Intent intent = new Intent(getContext(), PlacedOrderActivity.class);
+                Intent intent = new Intent(getContext(), PaymentActivity.class);
                 intent.putExtra("itemList", (Serializable) list);
+                intent.putExtra("totalAmount", totalAmount);
                 startActivity(intent);
             }
         });
@@ -123,10 +127,11 @@ public class MyCartsFragment extends Fragment {
             }
           }
       });
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void calculTotalAmount(List<MyCartModel> list) {
-        double totalAmount = 0.0;
+
         for(MyCartModel model : list){
             totalAmount += model.getTotalPrice();
         }
