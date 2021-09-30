@@ -91,7 +91,7 @@ public class MyCartsFragment extends Fragment {
                 //Intent intent = new Intent(getContext(), PlacedOrderActivity.class);
                 Intent intent = new Intent(getContext(), PaymentActivity.class);
                 intent.putExtra("itemList", (Serializable) list);
-                intent.putExtra("totalAmount", totalAmount);
+                //intent.putExtra("totalAmount", totalAmount);
                 startActivity(intent);
             }
         });
