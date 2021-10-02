@@ -1,6 +1,7 @@
 package tn.app.grocerystore.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +16,17 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import tn.app.grocerystore.R;
-import tn.app.grocerystore.models.RecommendedModel;
+import tn.app.grocerystore.activities.DetailsProductActivity;
+import tn.app.grocerystore.models.ViewAllModel;
 
 public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.ViewHolder> {
 
     Context context;
-    List<RecommendedModel> recommendedModelList;
+    List<ViewAllModel> list;
 
-    public RecommendedAdapter(Context context, List<RecommendedModel> recommendedModelList) {
+    public RecommendedAdapter(Context context, List<ViewAllModel> list) {
         this.context = context;
-        this.recommendedModelList = recommendedModelList;
+        this.list = list;
     }
 
     @NonNull
@@ -36,15 +38,24 @@ public class RecommendedAdapter extends RecyclerView.Adapter<RecommendedAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        Glide.with(context).load(recommendedModelList.get(position).getImg_url()).into(holder.recImage);
-        holder.name.setText(recommendedModelList.get(position).getName());
-        holder.description.setText(recommendedModelList.get(position).getDescription());
-        holder.rating.setText(recommendedModelList.get(position).getRating());
+        Glide.with(context).load(list.get(position).getImg_url()).into(holder.recImage);
+        holder.name.setText(list.get(position).getName());
+        holder.description.setText(list.get(position).getDescription());
+        holder.rating.setText(list.get(position).getRating());
+        
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, DetailsProductActivity.class);
+                intent.putExtra("detail", list.get(position));
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return recommendedModelList.size();
+        return list.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{

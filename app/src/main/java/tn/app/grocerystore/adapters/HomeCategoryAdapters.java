@@ -17,14 +17,14 @@ import java.util.List;
 
 import tn.app.grocerystore.R;
 import tn.app.grocerystore.activities.ViewAllActivity;
-import tn.app.grocerystore.models.HomeCategory;
+import tn.app.grocerystore.models.Category;
 
 public class HomeCategoryAdapters extends RecyclerView.Adapter<HomeCategoryAdapters.ViewHolder> {
 
     Context context;
-    List<HomeCategory> categoryList;
+    List<Category> categoryList;
 
-    public HomeCategoryAdapters(Context context, List<HomeCategory> categoryList) {
+    public HomeCategoryAdapters(Context context, List<Category> categoryList) {
         this.context = context;
         this.categoryList = categoryList;
     }

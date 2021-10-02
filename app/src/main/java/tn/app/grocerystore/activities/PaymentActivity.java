@@ -151,6 +151,9 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
 
         SimpleDateFormat currentTime = new SimpleDateFormat("HH:mm:ss a");
         saveCurrentTime = currentTime.format(calForDate.getTime());
+
+        String uid = auth.getCurrentUser().getEmail();
+
         try {
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("name", options.getString("name"));
@@ -159,10 +162,12 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
             hashMap.put("amount", options.getString("amount"));
             hashMap.put("currentDate", saveCurrentDate);
             hashMap.put("currentTime", saveCurrentTime);
+            hashMap.put("email", uid);
             //Toast.makeText(this, "Payment  : "+hashMap, Toast.LENGTH_LONG).show();
 
             //add data to firestore
-            firestore.collection("Orders").add(hashMap)
+            firestore.collection("CurrentUser").document(auth.getCurrentUser().getUid())
+                    .collection("myPayments").add(hashMap)
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(@NonNull DocumentReference documentReference) {

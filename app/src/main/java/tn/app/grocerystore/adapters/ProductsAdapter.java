@@ -23,18 +23,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 
 import tn.app.grocerystore.R;
-import tn.app.grocerystore.activities.NavCategoryActivity;
-import tn.app.grocerystore.models.Category;
+import tn.app.grocerystore.activities.DetailsProductActivity;
+import tn.app.grocerystore.models.ViewAllModel;
 
-public class NavCategoryAdapter extends RecyclerView.Adapter<NavCategoryAdapter.ViewHolder> {
+public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.MyHolder> {
 
     Context context;
-    List<Category> list;
+    List<ViewAllModel> list;
 
     FirebaseFirestore firestore;
     FirebaseAuth auth;
 
-    public NavCategoryAdapter(Context context, List<Category> list) {
+    public ProductsAdapter(Context context, List<ViewAllModel> list) {
         this.context = context;
         this.list = list;
 
@@ -44,22 +44,23 @@ public class NavCategoryAdapter extends RecyclerView.Adapter<NavCategoryAdapter.
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.nav_cat_item, parent, false));
+    public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new MyHolder(LayoutInflater.from(context).inflate(R.layout.row_products, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Glide.with(context).load(list.get(position).getImg_url()).into(holder.imageView);
+    public void onBindViewHolder(@NonNull MyHolder holder, int position) {
+        Glide.with(context).load(list.get(position).getImg_url()).into(holder.image);
         holder.name.setText(list.get(position).getName());
         holder.description.setText(list.get(position).getDescription());
-        holder.discount.setText(list.get(position).getDiscount());
+        holder.price.setText(String.format("%d$",list.get(position).getPrice()));
+        holder.rating.setText(list.get(position).getRating());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, NavCategoryActivity.class);
-                intent.putExtra("type", list.get(position).getType());
+                Intent intent = new Intent(context, DetailsProductActivity.class);
+                intent.putExtra("detail", list.get(position));
                 context.startActivity(intent);
             }
         });
@@ -74,8 +75,8 @@ public class NavCategoryAdapter extends RecyclerView.Adapter<NavCategoryAdapter.
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        firestore.collection("NavCategory")
-                                .document(list.get(position).getCategoryId())
+                        firestore.collection("AllProducts")
+                                .document(list.get(position).getProductId())
                                 .delete()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -104,16 +105,18 @@ public class NavCategoryAdapter extends RecyclerView.Adapter<NavCategoryAdapter.
         return list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class MyHolder extends RecyclerView.ViewHolder {
 
-        ImageView imageView;
-        TextView name, description, discount;
-        public ViewHolder(@NonNull View itemView) {
+        ImageView image;
+        TextView name, description, price, rating;
+        public MyHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.cat_nav_img);
-            name = itemView.findViewById(R.id.nav_cat_name);
-            description = itemView.findViewById(R.id.nav_cat_description);
-            discount = itemView.findViewById(R.id.nav_cat_discount);
+
+            image = itemView.findViewById(R.id.imageIv);
+            name = itemView.findViewById(R.id.nameTv);
+            description = itemView.findViewById(R.id.descriptionTv);
+            price = itemView.findViewById(R.id.priceTv);
+            rating = itemView.findViewById(R.id.ratingTv);
         }
     }
 }

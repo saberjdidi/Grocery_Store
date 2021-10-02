@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class ViewAllModel implements Serializable {
     String name, description, rating, type, img_url;
     int price;
+    String productId;
 
     public ViewAllModel() {
     }
@@ -64,5 +65,13 @@ public class ViewAllModel implements Serializable {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public String getProductId() {
+        return productId;
+    }
+
+    public void setProductId(String productId) {
+        this.productId = productId;
     }
 }

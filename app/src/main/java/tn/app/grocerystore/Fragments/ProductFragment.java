@@ -1,7 +1,10 @@
-package tn.app.grocerystore.ui.category;
+package tn.app.grocerystore.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -44,55 +47,58 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import tn.app.grocerystore.MyDialog;
 import tn.app.grocerystore.R;
-import tn.app.grocerystore.adapters.NavCategoryAdapter;
+import tn.app.grocerystore.adapters.ListCategoryAdapter;
+import tn.app.grocerystore.adapters.ProductsAdapter;
 import tn.app.grocerystore.models.Category;
+import tn.app.grocerystore.models.ViewAllModel;
 
-public class CategoryFragment extends Fragment {
+public class ProductFragment extends Fragment {
 
     SwipeRefreshLayout swipeRefreshLayout;
-    RecyclerView recyclerView;
-    List<Category> list;
-    NavCategoryAdapter adapter;
-    ProgressBar progressBar, progressBarDialog;
+    RecyclerView recyclerView, recyclerView_cat;
+    List<ViewAllModel> list;
+    List<Category> listCategory;
+    ListCategoryAdapter adapterCategory;
+    ProductsAdapter adapter;
     FloatingActionButton fab;
+    ProgressBar progressBarDialog;
 
     FirebaseStorage storage;
     FirebaseAuth auth;
     FirebaseFirestore db;
 
-    //add category
-    Dialog dialogCategory;
-    CircleImageView categoryImg;
-    EditText nameEt, descriptionEt, discountEt;
+    //add product
+    Dialog dialogProduct;
+    MyDialog dialogListCategory;
+    CircleImageView productImg;
+    EditText nameEt, descriptionEt, ratingEt, priceEt, cat_search;
     Spinner typeEt;
-    Button saveBtn;
+    Button saveBtn, searchBtn;
 
     Uri image_uri;
-
     String[] typeList = {"fruit", "egg", "proteine"};
     ArrayAdapter<String> adapterType;
+    List<String> category;
+    String nameCat;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_product, container, false);
 
-
-
-        View root = inflater.inflate(R.layout.fragment_category, container, false);
-
-        swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
-        recyclerView = root.findViewById(R.id.cat_rec);
-        progressBar = root.findViewById(R.id.progressbar);
-        fab = root.findViewById(R.id.fab);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        recyclerView = view.findViewById(R.id.product_rec);
+        fab = view.findViewById(R.id.fab);
 
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        progressBar.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
-
-        dialogCategory = new Dialog(getContext());
+        dialogProduct = new Dialog(getContext());
+        dialogListCategory = new MyDialog(getContext());
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -110,7 +116,7 @@ public class CategoryFragment extends Fragment {
 
         loadData();
 
-        return root;
+        return view;
     }
 
     private void loadData() {
@@ -119,59 +125,58 @@ public class CategoryFragment extends Fragment {
         list = new ArrayList<>();
         swipeRefreshLayout.setRefreshing(true);
 
-        db.collection("NavCategory")
+        db.collection("AllProducts")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                String categoryId = document.getId();
-
-                                Category model = document.toObject(Category.class);
-                                model.setCategoryId(categoryId);
+                                String productId = document.getId();
+                                ViewAllModel model = document.toObject(ViewAllModel.class);
+                                model.setProductId(productId);
                                 list.add(model);
-
-                                progressBar.setVisibility(View.GONE);
-                                recyclerView.setVisibility(View.VISIBLE);
                             }
 
-                            adapter = new NavCategoryAdapter(getActivity(), list);
+                            adapter = new ProductsAdapter(getActivity(), list);
                             recyclerView.setAdapter(adapter);
                             adapter.notifyDataSetChanged();
                             swipeRefreshLayout.setRefreshing(false);
                         } else {
-                            Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
                             Log.w("TAG", "Error getting documents.", task.getException());
-                            progressBar.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
                             swipeRefreshLayout.setRefreshing(false);
                         }
                     }
                 });
     }
 
-    private void openDialog(){
+    private void openDialog() {
 
 
-        dialogCategory.setContentView(R.layout.new_category_popup);
-        dialogCategory.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogProduct.setContentView(R.layout.new_product_popup);
+        dialogProduct.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        categoryImg = dialogCategory.findViewById(R.id.cat_img);
-        nameEt = dialogCategory.findViewById(R.id.cat_name);
-        descriptionEt = dialogCategory.findViewById(R.id.cat_description);
-        discountEt = dialogCategory.findViewById(R.id.cat_discount);
-        typeEt = dialogCategory.findViewById(R.id.cat_type);
-        saveBtn = dialogCategory.findViewById(R.id.cat_btn);
-        progressBarDialog = dialogCategory.findViewById(R.id.progressbar_dialog);
+        productImg = dialogProduct.findViewById(R.id.poduct_img);
+        nameEt = dialogProduct.findViewById(R.id.poduct_name);
+        descriptionEt = dialogProduct.findViewById(R.id.poduct_description);
+        ratingEt = dialogProduct.findViewById(R.id.product_rating);
+        typeEt = dialogProduct.findViewById(R.id.product_type);
+        priceEt = dialogProduct.findViewById(R.id.product_price);
+        cat_search = dialogProduct.findViewById(R.id.cat_search);
+        searchBtn = dialogProduct.findViewById(R.id.searchBtn);
+        saveBtn = dialogProduct.findViewById(R.id.product_btn);
+        progressBarDialog = dialogProduct.findViewById(R.id.progressbar_dialog);
         progressBarDialog.setVisibility(View.GONE);
 
+        priceEt.setText("10");
+
         adapterType = new ArrayAdapter<>(getActivity()
-                ,android.R.layout.simple_dropdown_item_1line, typeList);
+                , android.R.layout.simple_dropdown_item_1line, typeList);
         typeEt.setAdapter(adapterType);
 
         //get image from gallery
-        categoryImg.setOnClickListener(new View.OnClickListener() {
+        productImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //show image pick dialog
@@ -182,38 +187,62 @@ public class CategoryFragment extends Fragment {
             }
         });
 
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openDialogCategory();
+            }
+        });
+
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                addCategory();
+                addProduct();
             }
         });
-        dialogCategory.show();
+        dialogProduct.show();
     }
 
-    private void addCategory() {
+    private void openDialogCategory() {
+        dialogListCategory.setContentView(R.layout.dialog_category_list_popup);
+        dialogListCategory.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        recyclerView_cat = dialogListCategory.findViewById(R.id.cat_recyclerview);
+        getListCategories();
+        //pass data in dialog
+        dialogListCategory.setOnDismissListener((d) -> {
+            Category c = listCategory.get(dialogListCategory.getValeur());
+            nameCat = c.getName();
+            //Toast.makeText(ProductFragment.this.getContext(), c.getName(), Toast.LENGTH_LONG).show();
+            cat_search.setText(nameCat);
+        });
+
+    }
+
+    private void addProduct() {
+        progressBarDialog.setVisibility(View.VISIBLE);
         String name = nameEt.getText().toString();
         String description = descriptionEt.getText().toString();
-        String discount = discountEt.getText().toString();
-        String type = typeEt.getSelectedItem().toString().trim();
+        String rating = ratingEt.getText().toString();
+        //String type = typeEt.getSelectedItem().toString().trim();
+        String type = cat_search.getText().toString();
+        int price = Integer.parseInt(priceEt.getText().toString());
 
-        progressBarDialog.setVisibility(View.VISIBLE);
-
-        if(TextUtils.isEmpty(name)){
+        if (TextUtils.isEmpty(name)) {
             nameEt.setError("Name is required");
             return;
         }
-        if(TextUtils.isEmpty(description)){
+        if (TextUtils.isEmpty(description)) {
             descriptionEt.setError("Description is required");
             return;
         }
-        if(TextUtils.isEmpty(discount)){
-            discountEt.setError("Discount is required");
+        if (TextUtils.isEmpty(rating)) {
+            ratingEt.setError("Rating is required");
             return;
         }
-        //Toast.makeText(getContext(), "Category "+name+" "+discount+" "+type, Toast.LENGTH_SHORT).show();
-        final StorageReference reference = storage.getReference().child("categories_picture")
+
+        final StorageReference reference = storage.getReference().child("products_picture")
                 .child(FirebaseAuth.getInstance().getUid());
 
         reference.putFile(image_uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -228,33 +257,34 @@ public class CategoryFragment extends Fragment {
                         hashMap.put("name", name);
                         hashMap.put("description", description);
                         hashMap.put("img_url", uri.toString());
-                        hashMap.put("discount", discount + "% OFF");
+                        hashMap.put("rating", rating);
                         hashMap.put("type", type);
+                        hashMap.put("price", price);
 
                         // Add a new document with a generated ID
-                        db.collection("NavCategory")
+                        db.collection("AllProducts")
                                 .add(hashMap)
                                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                     @Override
                                     public void onSuccess(DocumentReference documentReference) {
                                         Log.d("Product", "DocumentSnapshot added with ID: " + documentReference.getId());
-                                        Toast.makeText(getContext(), "Category Added" , Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getContext(), "Product Added", Toast.LENGTH_SHORT).show();
                                         //getActivity().onBackPressed();
                                         nameEt.setText("");
                                         descriptionEt.setText("");
-                                        discountEt.setText("");
-
-                                        list.add(new Category(name, description, discount+"% OFF", uri.toString(), type));
+                                        ratingEt.setText("");
+                                        priceEt.setText("");
+                                        list.add(new ViewAllModel(name, description, rating, type, uri.toString(), price));
                                         adapter.notifyItemInserted(list.size());
-                                        dialogCategory.dismiss();
+                                        dialogProduct.dismiss();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         Log.w("Product", "Error adding document", e);
-                                        Toast.makeText(getContext(), "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        dialogCategory.dismiss();
+                                        Toast.makeText(getContext(), "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        dialogProduct.dismiss();
                                         progressBarDialog.setVisibility(View.GONE);
                                     }
                                 });
@@ -264,13 +294,42 @@ public class CategoryFragment extends Fragment {
         });
     }
 
+    private void getListCategories() {
+        //Popular items
+        recyclerView_cat.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        listCategory = new ArrayList<>();
+
+        db.collection("NavCategory")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Category model = document.toObject(Category.class);
+                                listCategory.add(model);
+                            }
+
+                            adapterCategory = new ListCategoryAdapter(getActivity(), listCategory, dialogListCategory);
+                            recyclerView_cat.setAdapter(adapterCategory);
+                            adapterCategory.notifyDataSetChanged();
+                            dialogListCategory.show();
+                        } else {
+                            Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(data.getData() != null){
+        if (data.getData() != null) {
             image_uri = data.getData();
-            categoryImg.setImageURI(image_uri);
+            productImg.setImageURI(image_uri);
 
         }
     }

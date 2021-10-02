@@ -1,12 +1,13 @@
 package tn.app.grocerystore.models;
 
-public class NavCategoryModel {
+public class Category {
     String name, description, discount, img_url, type;
+    String categoryId;
 
-    public NavCategoryModel() {
+    public Category() {
     }
 
-    public NavCategoryModel(String name, String description, String discount, String img_url, String type) {
+    public Category(String name, String description, String discount, String img_url, String type) {
         this.name = name;
         this.description = description;
         this.discount = discount;
@@ -52,5 +53,13 @@ public class NavCategoryModel {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
     }
 }

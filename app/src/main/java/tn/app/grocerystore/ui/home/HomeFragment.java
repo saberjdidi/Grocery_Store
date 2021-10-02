@@ -10,14 +10,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,10 +32,8 @@ import tn.app.grocerystore.adapters.HomeCategoryAdapters;
 import tn.app.grocerystore.adapters.PopularAdapters;
 import tn.app.grocerystore.adapters.RecommendedAdapter;
 import tn.app.grocerystore.adapters.ViewAllAdapter;
-import tn.app.grocerystore.databinding.FragmentHomeBinding;
-import tn.app.grocerystore.models.HomeCategory;
+import tn.app.grocerystore.models.Category;
 import tn.app.grocerystore.models.PopularModel;
-import tn.app.grocerystore.models.RecommendedModel;
 import tn.app.grocerystore.models.ViewAllModel;
 
 public class HomeFragment extends Fragment {
@@ -54,10 +48,10 @@ public class HomeFragment extends Fragment {
     List<PopularModel> popularModelList;
     PopularAdapters popularAdapters;
     //Home Category
-    List<HomeCategory> categoryList;
+    List<Category> categoryList;
     HomeCategoryAdapters homeCategoryAdapters;
     //Recommended
-    List<RecommendedModel> recommendedModelList;
+    List<ViewAllModel> recommendedModelList;
     RecommendedAdapter recommendedAdapter;
 
     //searchView
@@ -130,14 +124,14 @@ public class HomeFragment extends Fragment {
         homeCategoryAdapters = new HomeCategoryAdapters(getActivity(), categoryList);
         homeCatRec.setAdapter(homeCategoryAdapters);
 
-        db.collection("HomeCategory")
+        db.collection("NavCategory")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                HomeCategory homeCategory = document.toObject(HomeCategory.class);
+                                Category homeCategory = document.toObject(Category.class);
                                 categoryList.add(homeCategory);
                                 homeCategoryAdapters.notifyDataSetChanged();
 
@@ -161,14 +155,14 @@ public class HomeFragment extends Fragment {
         recommendedAdapter = new RecommendedAdapter(getActivity(), recommendedModelList);
         recommemdedRec.setAdapter(recommendedAdapter);
 
-        db.collection("Recommended")
+        db.collection("AllProducts")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                RecommendedModel recommendedModel = document.toObject(RecommendedModel.class);
+                                ViewAllModel recommendedModel = document.toObject(ViewAllModel.class);
                                 recommendedModelList.add(recommendedModel);
                                 popularAdapters.notifyDataSetChanged();
 

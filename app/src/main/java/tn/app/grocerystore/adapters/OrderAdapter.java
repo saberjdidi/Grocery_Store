@@ -33,6 +33,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.MyHolder> {
     @Override
     public void onBindViewHolder(@NonNull MyHolder holder, int position) {
 
+        holder.email.setText(list.get(position).getEmail());
         holder.name.setText(list.get(position).getName());
         holder.description.setText(list.get(position).getDescription());
         holder.date.setText(list.get(position).getCurrentDate());
@@ -48,11 +49,12 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.MyHolder> {
 
     public class MyHolder extends RecyclerView.ViewHolder {
 
-        TextView name, description, date, time, amount, currency;
+        TextView email, name, description, date, time, amount, currency;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
 
+            email = itemView.findViewById(R.id.order_email);
             name = itemView.findViewById(R.id.order_name);
             description = itemView.findViewById(R.id.order_description);
             date = itemView.findViewById(R.id.current_date);

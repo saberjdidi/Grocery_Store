@@ -45,10 +45,6 @@ public class DetailsProductActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details_product);
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
@@ -66,7 +62,14 @@ public class DetailsProductActivity extends AppCompatActivity {
         addToCart = findViewById(R.id.add_to_cart);
         quantity = findViewById(R.id.quantity);
 
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //toolbar.setTitle("Details of Product");
+
+
         if(viewAllModel != null) {
+
             Glide.with(getApplicationContext()).load(viewAllModel.getImg_url()).into(detailedImg);
             description.setText(viewAllModel.getDescription());
             rating.setText(viewAllModel.getRating());
