@@ -2,8 +2,10 @@ package tn.app.grocerystore;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -15,9 +17,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Locale;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 import tn.app.grocerystore.models.User;
 
 public class LoginActivity extends AppCompatActivity {
@@ -25,10 +31,12 @@ public class LoginActivity extends AppCompatActivity {
     Button signIn;
     EditText email, password;
     TextView signUp;
+    CircleImageView fab;
+    ProgressBar progressBar;
 
     FirebaseAuth auth;
 
-    ProgressBar progressBar;
+    private String localeString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,24 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 loginUser();
                 progressBar.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //multi-langage
+        fab = findViewById(R.id.fab);
+        setFlag();
+        Locale locale = getResources().getConfiguration().locale;
+        localeString = locale.toString().substring(0, 2);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (localeString.equals("en")) {
+                    setLocale("fr");
+                }
+                else {
+                    setLocale("en");
+                }
+
             }
         });
     }
@@ -89,5 +115,39 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    //multi langage
+    private void setLocale(String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        RestartActivity();
+    }
+
+    private void setFlag() {
+        Locale locale = getResources().getConfiguration().locale;
+        String lang = locale.toString().substring(0, 2);
+        if (lang.equals("en")) {
+            lang = "fr";
+        } else if (lang.equals("fr")) {
+            lang = "en";
+        }
+        String iconId = "ic_flag_" + lang;
+        fab.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), getResources().getIdentifier(iconId, "drawable", getPackageName())));
+
+    }
+    private void RestartActivity() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
     }
 }

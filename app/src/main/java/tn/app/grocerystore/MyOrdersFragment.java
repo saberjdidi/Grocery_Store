@@ -11,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,6 +38,7 @@ public class MyOrdersFragment extends Fragment {
     RecyclerView recyclerView;
     OrderAdapter adapter;
     List<OrderModel> list;
+    TextView emptyTv;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,6 +48,7 @@ public class MyOrdersFragment extends Fragment {
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         recyclerView = view.findViewById(R.id.rec_order);
+        emptyTv = view.findViewById(R.id.emptyTv);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         auth = FirebaseAuth.getInstance();
@@ -80,6 +83,14 @@ public class MyOrdersFragment extends Fragment {
                         list.add(model);
                         adapter.notifyDataSetChanged();
                         swipeRefreshLayout.setRefreshing(false);
+                    }
+                    if(list.size() == 0){
+                        recyclerView.setVisibility(View.GONE);
+                        emptyTv.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        recyclerView.setVisibility(View.VISIBLE);
+                        emptyTv.setVisibility(View.GONE);
                     }
                 }
             }

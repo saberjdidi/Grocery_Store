@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Grocery Store</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -7,22 +8,22 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="menu_home">Home</string>
+    <string name="menu_home">Acceuil</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="profile">Profile</string>
-    <string name="category">Category</string>
+    <string name="category">Catégorie</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="offers">Offers</string>
-    <string name="new_product">New Product</string>
-    <string name="my_orders">My Orders</string>
-    <string name="my_carts">My Carts</string>
-    <string name="logout">Logout</string>
-    <string name="product">Products</string>
-    <string name="new_address">New Address</string>
-    <string name="have_account">Don\'t have an account ?</string>
-    <string name="signup">Sign Up</string>
-    <string name="signin">Sign In</string>
-    <string name="password">Password</string>
+    <string name="offers">Offres</string>
+    <string name="new_product">Nouveau Produit</string>
+    <string name="my_orders">Commandes</string>
+    <string name="my_carts">Chariots</string>
+    <string name="logout">Se déconnecter</string>
+    <string name="product">Produits</string>
+    <string name="new_address">Nouveau Adresse</string>
+    <string name="have_account">Ne pas avoir de compte ?</string>
+    <string name="signup">S\'inscrire</string>
+    <string name="signin">S\'identifier</string>
+    <string name="password">Mot de passe</string>
 </resources>

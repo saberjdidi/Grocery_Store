@@ -145,7 +145,7 @@ public class RegistrationActivity extends AppCompatActivity {
                          ref.putFile(image_uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                              @Override
                              public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                 User user = new User(userName, userEmail, userPassword, userNumber, userAddress, image_uri.toString());
+                                 User user = new User(userName, userEmail, userPassword, userNumber, userAddress, image_uri.toString(), "ROLE_CLIENT");
                                  String id = task.getResult().getUser().getUid();
                                  database.getReference().child("Users").child(id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                                      @Override

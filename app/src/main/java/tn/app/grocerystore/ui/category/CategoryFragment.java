@@ -31,6 +31,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -47,6 +51,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import tn.app.grocerystore.R;
 import tn.app.grocerystore.adapters.NavCategoryAdapter;
 import tn.app.grocerystore.models.Category;
+import tn.app.grocerystore.models.User;
 
 public class CategoryFragment extends Fragment {
 
@@ -60,6 +65,7 @@ public class CategoryFragment extends Fragment {
     FirebaseStorage storage;
     FirebaseAuth auth;
     FirebaseFirestore db;
+    FirebaseDatabase database;
 
     //add category
     Dialog dialogCategory;
@@ -88,6 +94,7 @@ public class CategoryFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
+        database = FirebaseDatabase.getInstance();
 
         progressBar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
@@ -100,6 +107,22 @@ public class CategoryFragment extends Fragment {
                 loadData();
             }
         });
+
+        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if(user.getRole().equals("ROLE_CLIENT")){
+                            fab.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

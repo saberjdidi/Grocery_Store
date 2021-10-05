@@ -35,7 +35,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.MyHolder> {
 
         holder.email.setText(list.get(position).getEmail());
         holder.name.setText(list.get(position).getName());
-        holder.description.setText(list.get(position).getDescription());
+        holder.address.setText(list.get(position).getAddress());
         holder.date.setText(list.get(position).getCurrentDate());
         holder.time.setText(list.get(position).getCurrentTime());
         holder.amount.setText(list.get(position).getAmount());
@@ -49,14 +49,14 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.MyHolder> {
 
     public class MyHolder extends RecyclerView.ViewHolder {
 
-        TextView email, name, description, date, time, amount, currency;
+        TextView email, name, address, date, time, amount, currency;
 
         public MyHolder(@NonNull View itemView) {
             super(itemView);
 
             email = itemView.findViewById(R.id.order_email);
             name = itemView.findViewById(R.id.order_name);
-            description = itemView.findViewById(R.id.order_description);
+            address = itemView.findViewById(R.id.order_address);
             date = itemView.findViewById(R.id.current_date);
             time = itemView.findViewById(R.id.current_time);
             amount = itemView.findViewById(R.id.order_amount);

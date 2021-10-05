@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import tn.app.grocerystore.activities.AddressActivity;
 import tn.app.grocerystore.activities.PaymentActivity;
 import tn.app.grocerystore.activities.PlacedOrderActivity;
 import tn.app.grocerystore.adapters.MyCartAdapter;
@@ -46,12 +47,11 @@ public class MyCartsFragment extends Fragment {
     RecyclerView recyclerView;
     MyCartAdapter adapter;
     List<MyCartModel> list;
-    TextView overTotalAmount;
+    TextView overTotalAmount, emptyTv;
     ProgressBar progressBar;
 
     AppCompatButton buyNow;
     int totalBill;
-    double totalAmount = 0.0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +69,7 @@ public class MyCartsFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         progressBar = view.findViewById(R.id.progressbar);
         recyclerView = view.findViewById(R.id.recyclerView);
+        emptyTv = view.findViewById(R.id.emptyTv);
         buyNow = view.findViewById(R.id.buy_now);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -88,8 +89,8 @@ public class MyCartsFragment extends Fragment {
         buyNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = new Intent(getContext(), PlacedOrderActivity.class);
-                Intent intent = new Intent(getContext(), PaymentActivity.class);
+                Intent intent = new Intent(getContext(), AddressActivity.class);
+                //Intent intent = new Intent(getContext(), PaymentActivity.class);
                 intent.putExtra("itemList", (Serializable) list);
                 //intent.putExtra("totalAmount", totalAmount);
                 startActivity(intent);
@@ -123,6 +124,18 @@ public class MyCartsFragment extends Fragment {
                     recyclerView.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                 }
+                if(list.size() == 0){
+                    recyclerView.setVisibility(View.GONE);
+                    emptyTv.setVisibility(View.VISIBLE);
+                    buyNow.setVisibility(View.GONE);
+                    progressBar.setVisibility(View.GONE);
+                }
+                else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    emptyTv.setVisibility(View.GONE);
+                    buyNow.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                }
                 calculTotalAmount(list);
             }
           }
@@ -131,7 +144,7 @@ public class MyCartsFragment extends Fragment {
     }
 
     private void calculTotalAmount(List<MyCartModel> list) {
-
+        double totalAmount = 0.0;
         for(MyCartModel model : list){
             totalAmount += model.getTotalPrice();
         }

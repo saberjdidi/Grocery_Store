@@ -1,15 +1,15 @@
 package tn.app.grocerystore.models;
 
 public class OrderModel {
-    String email, name, description, currency, amount, currentDate, currentTime;
+    String email, name, address, currency, amount, currentDate, currentTime;
 
     public OrderModel() {
     }
 
-    public OrderModel(String email, String name, String description, String currency, String amount, String currentDate, String currentTime) {
+    public OrderModel(String email, String name, String address, String currency, String amount, String currentDate, String currentTime) {
         this.email = email;
         this.name = name;
-        this.description = description;
+        this.address = address;
         this.currency = currency;
         this.amount = amount;
         this.currentDate = currentDate;
@@ -32,12 +32,12 @@ public class OrderModel {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getAddress() {
+        return address;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getCurrency() {

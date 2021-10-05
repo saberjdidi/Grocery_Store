@@ -28,12 +28,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -52,6 +57,7 @@ import tn.app.grocerystore.R;
 import tn.app.grocerystore.adapters.ListCategoryAdapter;
 import tn.app.grocerystore.adapters.ProductsAdapter;
 import tn.app.grocerystore.models.Category;
+import tn.app.grocerystore.models.User;
 import tn.app.grocerystore.models.ViewAllModel;
 
 public class ProductFragment extends Fragment {
@@ -68,6 +74,7 @@ public class ProductFragment extends Fragment {
     FirebaseStorage storage;
     FirebaseAuth auth;
     FirebaseFirestore db;
+    FirebaseDatabase database;
 
     //add product
     Dialog dialogProduct;
@@ -96,6 +103,7 @@ public class ProductFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         db = FirebaseFirestore.getInstance();
+        database = FirebaseDatabase.getInstance();
 
         dialogProduct = new Dialog(getContext());
         dialogListCategory = new MyDialog(getContext());
@@ -107,6 +115,21 @@ public class ProductFragment extends Fragment {
             }
         });
 
+        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if(user.getRole().equals("ROLE_CLIENT")){
+                            fab.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

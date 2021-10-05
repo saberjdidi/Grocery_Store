@@ -38,7 +38,7 @@ import tn.app.grocerystore.models.OrderModel;
 public class PaymentActivity extends AppCompatActivity implements PaymentResultListener {
 
     Toolbar toolbar;
-    TextView totalAmount, totalPrice, totalQuantity, name;
+    TextView totalAmount, totalPrice, totalQuantity, name, addressTv;
     Button paymentBtn;
     ProgressBar progressbar;
 
@@ -46,6 +46,7 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
     FirebaseAuth auth;
 
     String product_name;
+    String address = "";
     int price = 0;
     int quantity = 0;
     double total_amount = 0.0;
@@ -63,6 +64,7 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
         firestore = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
 
+        addressTv = findViewById(R.id.addressTv);
         totalAmount = findViewById(R.id.total_amount);
         totalPrice = findViewById(R.id.price);
         totalQuantity = findViewById(R.id.quantity);
@@ -71,7 +73,8 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
         progressbar = findViewById(R.id.progressbar);
         progressbar.setVisibility(View.GONE);
 
-        List<MyCartModel> list = (ArrayList<MyCartModel>) getIntent().getSerializableExtra("itemList");
+        address = getIntent().getStringExtra("address");
+        List<MyCartModel> list = (ArrayList<MyCartModel>) getIntent().getSerializableExtra("listCart");
         if(list != null && list.size() > 0) {
 
             for (MyCartModel model : list) {
@@ -81,6 +84,7 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
                 total_amount += model.getTotalPrice();
             }
 
+            addressTv.setText(address);
             totalPrice.setText(String.format("%d$",price));
             totalQuantity.setText(String.valueOf(quantity));
             totalAmount.setText(String.valueOf(total_amount));
@@ -113,7 +117,7 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
         try {
             options = new JSONObject();
             options.put("name", product_name);
-            options.put("description", "Reference Num. #123654");
+            options.put("address", address);
             options.put("currency", "USD");
             //options.put("quantity", quantity);
             options.put("amount", total_amount);
@@ -157,7 +161,7 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
         try {
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("name", options.getString("name"));
-            hashMap.put("description", options.getString("description"));
+            hashMap.put("address", options.getString("address"));
             hashMap.put("currency", options.getString("currency"));
             hashMap.put("amount", options.getString("amount"));
             hashMap.put("currentDate", saveCurrentDate);

@@ -3,17 +3,19 @@ package tn.app.grocerystore.models;
 public class User {
     String name, email, password, number, address;
     String profileImg;
+    String role;
 
     public User() {
     }
 
-    public User(String name, String email, String password, String number, String address, String profileImg) {
+    public User(String name, String email, String password, String number, String address, String profileImg, String role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.number = number;
         this.address = address;
         this.profileImg = profileImg;
+        this.role = role;
     }
 
     public String getName() {
@@ -62,5 +64,13 @@ public class User {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

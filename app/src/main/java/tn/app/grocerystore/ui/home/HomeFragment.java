@@ -23,6 +23,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.smarteist.autoimageslider.SliderView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import tn.app.grocerystore.R;
 import tn.app.grocerystore.adapters.HomeCategoryAdapters;
 import tn.app.grocerystore.adapters.PopularAdapters;
 import tn.app.grocerystore.adapters.RecommendedAdapter;
+import tn.app.grocerystore.adapters.SliderAdapter;
 import tn.app.grocerystore.adapters.ViewAllAdapter;
 import tn.app.grocerystore.models.Category;
 import tn.app.grocerystore.models.PopularModel;
@@ -41,12 +43,19 @@ public class HomeFragment extends Fragment {
     ScrollView scrollView;
     ProgressBar progressBar;
 
-    RecyclerView popularRec, homeCatRec, recommemdedRec;
     FirebaseFirestore db;
+
+    RecyclerView popularRec, homeCatRec, recommemdedRec;
+    SliderView sliderView;
+
+    String url1 = "https://www.geeksforgeeks.org/wp-content/uploads/gfg_200X200-1.png";
+    String url2 = "https://qphs.fs.quoracdn.net/main-qimg-8e203d34a6a56345f86f1a92570557ba.webp";
+    String url3 = "https://bizzbucket.co/wp-content/uploads/2020/08/Life-in-The-Metro-Blog-Title-22.png";
 
     //Popular items
     List<PopularModel> popularModelList;
     PopularAdapters popularAdapters;
+    SliderAdapter sliderAdapter;
     //Home Category
     List<Category> categoryList;
     HomeCategoryAdapters homeCategoryAdapters;
@@ -70,6 +79,7 @@ public class HomeFragment extends Fragment {
         popularRec = root.findViewById(R.id.pop_rec);
         homeCatRec = root.findViewById(R.id.explore_rec);
         recommemdedRec = root.findViewById(R.id.recommended_rec);
+        sliderView = root.findViewById(R.id.slider);
 
         db = FirebaseFirestore.getInstance();
 
@@ -88,11 +98,23 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadDataProducts(){
-        //Popular items
-        popularRec.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
         popularModelList = new ArrayList<>();
+       /* popularModelList.add(new PopularModel("name1", "description1", "rating", "discount", "type", url1));
+        popularModelList.add(new PopularModel("name2", "description1", "rating", "discount", "type", url2));
+        popularModelList.add(new PopularModel("name3", "description1", "rating", "discount", "type", url2)); */
+        //Popular items
+
+        //recycler view
+        popularRec.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.HORIZONTAL, false));
         popularAdapters = new PopularAdapters(getActivity(), popularModelList);
         popularRec.setAdapter(popularAdapters);
+        //slider view
+        sliderView.setAutoCycleDirection(SliderView.LAYOUT_DIRECTION_LTR);
+        sliderAdapter = new SliderAdapter(getActivity(), popularModelList);
+        sliderView.setSliderAdapter(sliderAdapter);
+        sliderView.setScrollTimeInSec(3);
+        sliderView.setAutoCycle(true);
+        sliderView.startAutoCycle();
 
         db.collection("PopularProducts")
                 .get()
@@ -104,10 +126,12 @@ public class HomeFragment extends Fragment {
                                 PopularModel popularModel = document.toObject(PopularModel.class);
                                 popularModelList.add(popularModel);
                                 popularAdapters.notifyDataSetChanged();
+                                sliderAdapter.notifyDataSetChanged();
 
                                 progressBar.setVisibility(View.GONE);
                                 scrollView.setVisibility(View.VISIBLE);
                             }
+
                         } else {
                             Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
                             Log.w("TAG", "Error getting documents.", task.getException());
