@@ -21,8 +21,13 @@
     <string name="logout">Logout</string>
     <string name="product">Products</string>
     <string name="new_address">New Address</string>
-    <string name="have_account">Don\'t have an account ?</string>
+    <string name="havnt_account">Don\'t have an account ?</string>
     <string name="signup">Sign Up</string>
     <string name="signin">Sign In</string>
     <string name="password">Password</string>
+    <string name="name">name</string>
+    <string name="phone">Phone Number</string>
+    <string name="address">Address</string>
+    <string name="have_account">Already have an account ?</string>
+    <string name="users">Users</string>
 </resources>

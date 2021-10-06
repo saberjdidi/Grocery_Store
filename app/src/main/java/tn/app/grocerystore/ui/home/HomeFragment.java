@@ -2,9 +2,13 @@ package tn.app.grocerystore.ui.home;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -13,6 +17,8 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -253,5 +259,15 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        //inflater menu
+        inflater.inflate(R.menu.main, menu);
+        //hide addpost icon from this fragment
+        menu.findItem(R.id.action_search).setVisible(false);
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

@@ -4,10 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +47,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        if (!isConnected(this)) {
+            showInternetDialog();
+        }
 
         auth = FirebaseAuth.getInstance();
 
@@ -144,10 +153,41 @@ public class LoginActivity extends AppCompatActivity {
         finish();
         startActivity(intent);
     }
-
     @Override
     public void onBackPressed() {
         finish();
         super.onBackPressed();
+    }
+    //check internet connection
+    private void showInternetDialog() {
+
+        Dialog dialog = new Dialog(this);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        View view = LayoutInflater.from(this).inflate(R.layout.no_internet_dialog, findViewById(R.id.no_internet_layout));
+        view.findViewById(R.id.btnOk).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isConnected(LoginActivity.this)) {
+                    showInternetDialog();
+                } else {
+                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    finish();
+                }
+            }
+        });
+
+        dialog.setContentView(view);
+        dialog.show();
+
+    }
+
+    private boolean isConnected(LoginActivity loginActivity) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) loginActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        return (wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected());
     }
 }

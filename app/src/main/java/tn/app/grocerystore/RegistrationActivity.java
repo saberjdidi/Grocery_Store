@@ -152,6 +152,11 @@ public class RegistrationActivity extends AppCompatActivity {
                                      public void onSuccess(Void unused) {
                                          progressBar.setVisibility(View.GONE);
                                          Toast.makeText(RegistrationActivity.this, "Registration Successfully", Toast.LENGTH_SHORT).show();
+                                         name.setText("");
+                                         email.setText("");
+                                         password.setText("");
+                                         address.setText("");
+                                         number.setText("");
                                      }
                                  }).addOnFailureListener(new OnFailureListener() {
                                      @Override

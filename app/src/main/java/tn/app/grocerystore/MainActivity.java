@@ -1,7 +1,12 @@
 package tn.app.grocerystore;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
@@ -40,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (!isConnected(this)) {
+            showInternetDialog();
+        }
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -51,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_category, R.id.nav_address, R.id.nav_profile, R.id.nav_offers, R.id.nav_new_product,
-                R.id.nav_my_orders, R.id.nav_my_carts)
+                R.id.nav_my_orders, R.id.nav_my_carts, R.id.nav_users)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -66,6 +75,23 @@ public class MainActivity extends AppCompatActivity {
         TextView headerEmail = headerView.findViewById(R.id.nav_header_email);
         CircleImageView headerImage = headerView.findViewById(R.id.nav_header_image);
 
+        //get role of users
+        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if(user.getRole().equals("ROLE_CLIENT")){
+                            Menu nav_menu = navigationView.getMenu();
+                            nav_menu.findItem(R.id.nav_users).setVisible(false);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
         //get data from database of user
         database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -84,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -108,5 +135,38 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    // check internet connection
+    private void showInternetDialog() {
+
+        Dialog dialog = new Dialog(this);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        View view = LayoutInflater.from(this).inflate(R.layout.no_internet_dialog, findViewById(R.id.no_internet_layout));
+        view.findViewById(R.id.btnOk).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isConnected(MainActivity.this)) {
+                    showInternetDialog();
+                } else {
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    finish();
+                }
+            }
+        });
+
+        dialog.setContentView(view);
+        dialog.show();
+
+    }
+
+    private boolean isConnected(MainActivity mainActivity) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) mainActivity.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo wifiConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        NetworkInfo mobileConn = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        return (wifiConn != null && wifiConn.isConnected()) || (mobileConn != null && mobileConn.isConnected());
     }
 }

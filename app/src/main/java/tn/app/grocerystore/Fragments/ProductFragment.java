@@ -12,6 +12,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -23,6 +26,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -355,5 +360,81 @@ public class ProductFragment extends Fragment {
             productImg.setImageURI(image_uri);
 
         }
+    }
+
+    private void searchData(final String query) {
+        //Popular items
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        list = new ArrayList<>();
+
+        db.collection("AllProducts")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String productId = document.getId();
+                                ViewAllModel model = document.toObject(ViewAllModel.class);
+                                model.setProductId(productId);
+
+                                if(model.getName().toLowerCase().contains(query.toLowerCase()) ||
+                                   model.getDescription().toLowerCase().contains(query.toLowerCase())){
+                                    list.add(model);
+                                }
+                            }
+
+                            adapter = new ProductsAdapter(getActivity(), list);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        //setHasOptionsMenu(true); //to show menu option in fragment
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        //inflater menu
+        inflater.inflate(R.menu.main, menu);
+        //hide addpost icon from this fragment
+        //menu.findItem(R.id.action_search).setVisible(false);
+        //searchView
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //called when user press search button from keybord
+                if(!TextUtils.isEmpty(query.trim())){
+                    searchData(query);
+                } else {
+                    loadData();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                //called when user change text in searchView
+                if(!TextUtils.isEmpty(query.trim())){
+                    searchData(query);
+                } else {
+                    loadData();
+                }
+                return false;
+            }
+        });
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }
