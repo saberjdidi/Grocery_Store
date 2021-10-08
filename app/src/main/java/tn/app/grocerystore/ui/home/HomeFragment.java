@@ -1,5 +1,6 @@
 package tn.app.grocerystore.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -17,6 +18,7 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
@@ -25,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -34,6 +37,7 @@ import com.smarteist.autoimageslider.SliderView;
 import java.util.ArrayList;
 import java.util.List;
 
+import tn.app.grocerystore.LoginActivity;
 import tn.app.grocerystore.R;
 import tn.app.grocerystore.adapters.HomeCategoryAdapters;
 import tn.app.grocerystore.adapters.PopularAdapters;
@@ -262,12 +266,19 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true); //to show menu option in fragment
+        super.onCreate(savedInstanceState);
+    }
+    @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         //inflater menu
         inflater.inflate(R.menu.main, menu);
         //hide addpost icon from this fragment
         menu.findItem(R.id.action_search).setVisible(false);
+        menu.findItem(R.id.action_logout).setVisible(true);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
+
 }

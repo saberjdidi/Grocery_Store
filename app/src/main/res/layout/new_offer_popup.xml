@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="350dp"
+    android:layout_height="550dp"
+    android:layout_gravity="center"
+    android:layout_margin="5dp"
+    android:background="@drawable/border">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/offer_img"
+                android:layout_width="match_parent"
+                android:layout_height="130dp"
+                android:src="@mipmap/newproducts"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="1dp"/>
+
+            <EditText
+                android:id="@+id/offer_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_bg"
+                android:hint="Name"
+                android:padding="13dp"
+                android:inputType="textPersonName"
+                android:elevation="3dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintWidth_percent=".8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_img"
+                app:layout_constraintVertical_bias="0.11" />
+            <EditText
+                android:id="@+id/offer_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_bg"
+                android:hint="Description"
+                android:padding="13dp"
+                android:elevation="3dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintWidth_percent=".8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_name"
+                app:layout_constraintVertical_bias="0.11" />
+            <EditText
+                android:id="@+id/offer_discount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_bg"
+                android:hint="Discount"
+                android:padding="13dp"
+                android:elevation="3dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintWidth_percent=".8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_description"
+                app:layout_constraintVertical_bias="0.11" />
+            <EditText
+                android:id="@+id/offer_price"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edittext_bg"
+                android:hint="Discount"
+                android:padding="13dp"
+                android:elevation="3dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintWidth_percent=".8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_discount"
+                app:layout_constraintVertical_bias="0.11" />
+
+            <EditText
+                android:id="@+id/offer_date_debit"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_bg"
+                android:elevation="3dp"
+                android:hint="Date Debit"
+                android:editable="false"
+                android:padding="13dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.327"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_price"
+                app:layout_constraintWidth_percent=".8" />
+
+            <ImageView
+                android:id="@+id/dateDebitIv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/date_picker"
+                app:layout_constraintStart_toEndOf="@+id/offer_date_debit"
+                app:layout_constraintTop_toBottomOf="@+id/offer_price" />
+
+            <EditText
+                android:id="@+id/offer_date_fin"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_bg"
+                android:elevation="3dp"
+                android:hint="Date Fin"
+                android:editable="false"
+                android:padding="13dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.327"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_date_debit"
+                app:layout_constraintWidth_percent=".8" />
+
+            <ImageView
+                android:id="@+id/dateFinIv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/date_picker"
+                app:layout_constraintStart_toEndOf="@+id/offer_date_fin"
+                app:layout_constraintTop_toBottomOf="@+id/offer_date_debit" />
+
+            <Button
+                android:id="@+id/offer_btn"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:padding="14dp"
+                android:text="Save"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:layout_marginTop="7dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_date_fin"
+                app:layout_constraintVertical_bias="0.3" />
+            <ProgressBar
+                android:id="@+id/progressbar_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX=".5"
+                android:scaleY=".5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/offer_btn"
+                app:layout_constraintVertical_bias="0.13" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</RelativeLayout>

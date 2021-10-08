@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -16,10 +19,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,6 +67,7 @@ public class CategoryFragment extends Fragment {
     NavCategoryAdapter adapter;
     ProgressBar progressBar, progressBarDialog;
     FloatingActionButton fab;
+    TextView emptyTv;
 
     FirebaseStorage storage;
     FirebaseAuth auth;
@@ -90,6 +97,7 @@ public class CategoryFragment extends Fragment {
         recyclerView = root.findViewById(R.id.cat_rec);
         progressBar = root.findViewById(R.id.progressbar);
         fab = root.findViewById(R.id.fab);
+        emptyTv = root.findViewById(R.id.emptyTv);
 
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -169,6 +177,67 @@ public class CategoryFragment extends Fragment {
                             progressBar.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
                             swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
+    private void searchData(String query) {
+        //Popular items
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        list = new ArrayList<>();
+        swipeRefreshLayout.setRefreshing(true);
+
+        db.collection("NavCategory")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String categoryId = document.getId();
+
+                                Category model = document.toObject(Category.class);
+                                model.setCategoryId(categoryId);
+                                if(model.getName().toLowerCase().contains(query.toLowerCase()) ||
+                                   model.getDescription().toLowerCase().contains(query.toLowerCase())){
+                                    list.add(model);
+                                }
+
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
+                            }
+
+                            adapter = new NavCategoryAdapter(getActivity(), list);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
+                        } else {
+                            Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                            progressBar.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 });
@@ -296,5 +365,48 @@ public class CategoryFragment extends Fragment {
             categoryImg.setImageURI(image_uri);
 
         }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true); //to show menu option in fragment
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        //inflater menu
+        inflater.inflate(R.menu.main, menu);
+        //menu.findItem(R.id.action_search).setVisible(false);
+        menu.findItem(R.id.action_logout).setVisible(false);
+        //searchView
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //called when user press search button from keybord
+                if(!TextUtils.isEmpty(query.trim())){
+                    searchData(query);
+                } else {
+                    loadData();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                //called when user change text in searchView
+                if(!TextUtils.isEmpty(query.trim())){
+                    searchData(query);
+                } else {
+                    loadData();
+                }
+                return false;
+            }
+        });
+
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

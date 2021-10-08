@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -75,6 +76,7 @@ public class ProductFragment extends Fragment {
     ProductsAdapter adapter;
     FloatingActionButton fab;
     ProgressBar progressBarDialog;
+    TextView emptyTv;
 
     FirebaseStorage storage;
     FirebaseAuth auth;
@@ -104,6 +106,7 @@ public class ProductFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         recyclerView = view.findViewById(R.id.product_rec);
         fab = view.findViewById(R.id.fab);
+        emptyTv = view.findViewById(R.id.emptyTv);
 
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -174,6 +177,14 @@ public class ProductFragment extends Fragment {
                             Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
                             Log.w("TAG", "Error getting documents.", task.getException());
                             swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
                         }
                     }
                 });
@@ -363,7 +374,7 @@ public class ProductFragment extends Fragment {
     }
 
     private void searchData(final String query) {
-        //Popular items
+        swipeRefreshLayout.setRefreshing(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
         list = new ArrayList<>();
 
@@ -387,9 +398,19 @@ public class ProductFragment extends Fragment {
                             adapter = new ProductsAdapter(getActivity(), list);
                             recyclerView.setAdapter(adapter);
                             adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
                         } else {
                             Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
                             Log.w("TAG", "Error getting documents.", task.getException());
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
                         }
                     }
                 });
@@ -397,7 +418,7 @@ public class ProductFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        //setHasOptionsMenu(true); //to show menu option in fragment
+        setHasOptionsMenu(true); //to show menu option in fragment
         super.onCreate(savedInstanceState);
     }
 
@@ -405,8 +426,8 @@ public class ProductFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         //inflater menu
         inflater.inflate(R.menu.main, menu);
-        //hide addpost icon from this fragment
         //menu.findItem(R.id.action_search).setVisible(false);
+        menu.findItem(R.id.action_logout).setVisible(false);
         //searchView
         MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);

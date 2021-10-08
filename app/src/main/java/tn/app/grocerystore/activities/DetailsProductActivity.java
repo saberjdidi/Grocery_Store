@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import tn.app.grocerystore.R;
+import tn.app.grocerystore.models.Offer;
 import tn.app.grocerystore.models.ViewAllModel;
 
 public class DetailsProductActivity extends AppCompatActivity {
@@ -39,6 +40,7 @@ public class DetailsProductActivity extends AppCompatActivity {
     int totalPrice = 0;
 
     ViewAllModel viewAllModel;
+    Offer offer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,9 @@ public class DetailsProductActivity extends AppCompatActivity {
         final Object object = getIntent().getSerializableExtra("detail");
         if(object instanceof ViewAllModel){
             viewAllModel = (ViewAllModel) object;
+        }
+        if(object instanceof Offer){
+            offer = (Offer) object;
         }
 
         detailedImg = findViewById(R.id.detailed_img);
@@ -75,39 +80,65 @@ public class DetailsProductActivity extends AppCompatActivity {
             rating.setText(viewAllModel.getRating());
 
             if(viewAllModel.getType().equals("egg")){
-                price.setText("Price : "+viewAllModel.getPrice()+"/dozen");
+                price.setText(viewAllModel.getPrice()+"/dozen");
                 //totalPrice = viewAllModel.getPrice() * totalQuantity;
             }
             else if(viewAllModel.getType().equals("milk")){
-                price.setText("Price : "+viewAllModel.getPrice()+"/littre");
+                price.setText(viewAllModel.getPrice()+"/littre");
                 //totalPrice = viewAllModel.getPrice() * totalQuantity;
             }
             else {
-                price.setText("Price : "+viewAllModel.getPrice()+"/kg");
+                price.setText(viewAllModel.getPrice()+"/kg");
                 //totalPrice = viewAllModel.getPrice() * totalQuantity;
             }
+            addItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(totalQuantity < 10){
+                        totalQuantity++;
+                        quantity.setText(String.valueOf(totalQuantity));
+                        totalPrice = viewAllModel.getPrice() * totalQuantity;
+                    }
+                }
+            });
+            removeItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(totalQuantity > 1){
+                        totalQuantity--;
+                        quantity.setText(String.valueOf(totalQuantity));
+                        totalPrice = viewAllModel.getPrice() * totalQuantity;
+                    }
+                }
+            });
+        }
+        if(offer != null){
+            Glide.with(getApplicationContext()).load(offer.getImg_url()).into(detailedImg);
+            description.setText(offer.getDescription());
+            rating.setText("4.0");
+            price.setText(String.valueOf(offer.getPrice()));
+            addItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(totalQuantity < 10){
+                        totalQuantity++;
+                        quantity.setText(String.valueOf(totalQuantity));
+                        totalPrice = offer.getPrice() * totalQuantity;
+                    }
+                }
+            });
+            removeItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(totalQuantity > 1){
+                        totalQuantity--;
+                        quantity.setText(String.valueOf(totalQuantity));
+                        totalPrice = offer.getPrice() * totalQuantity;
+                    }
+                }
+            });
         }
 
-        addItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(totalQuantity < 10){
-                    totalQuantity++;
-                    quantity.setText(String.valueOf(totalQuantity));
-                    totalPrice = viewAllModel.getPrice() * totalQuantity;
-                }
-            }
-        });
-        removeItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(totalQuantity > 1){
-                    totalQuantity--;
-                    quantity.setText(String.valueOf(totalQuantity));
-                    totalPrice = viewAllModel.getPrice() * totalQuantity;
-                }
-            }
-        });
         addToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,7 +159,12 @@ public class DetailsProductActivity extends AppCompatActivity {
         saveCurrentTime = currentTime.format(calForDate.getTime());
 
         final HashMap<String, Object> cartMap = new HashMap<>();
-        cartMap.put("productName", viewAllModel.getName());
+        if(viewAllModel != null){
+            cartMap.put("productName", viewAllModel.getName());
+        }
+        if(offer != null){
+            cartMap.put("productName", offer.getName());
+        }
         cartMap.put("productPrice", price.getText().toString());
         cartMap.put("currentDate", saveCurrentDate);
         cartMap.put("currentTime", saveCurrentTime);
