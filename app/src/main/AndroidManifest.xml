@@ -9,9 +9,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/grocery"
+        android:icon="@drawable/fruits"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/grocery"
+        android:roundIcon="@drawable/fruits"
         android:supportsRtl="true"
         android:theme="@style/Theme.GroceryStore">
         <activity

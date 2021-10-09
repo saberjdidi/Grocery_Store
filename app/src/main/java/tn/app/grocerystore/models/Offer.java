@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Offer implements Serializable {
     String name, description, discount, Date_debut, Date_fin, img_url;
     int price;
+    String offerId;
 
     public Offer() {
     }
@@ -17,6 +18,14 @@ public class Offer implements Serializable {
         Date_fin = date_fin;
         this.img_url = img_url;
         this.price = price;
+    }
+
+    public String getOfferId() {
+        return offerId;
+    }
+
+    public void setOfferId(String offerId) {
+        this.offerId = offerId;
     }
 
     public String getName() {

@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_home, R.id.nav_category, R.id.nav_address, R.id.nav_profile, R.id.nav_offers, R.id.nav_new_product,
-                R.id.nav_my_orders, R.id.nav_my_carts, R.id.nav_users)
+                R.id.nav_my_orders, R.id.nav_my_carts, R.id.nav_users, R.id.nav_logout)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -125,22 +125,27 @@ public class MainActivity extends AppCompatActivity {
         return true;
     } */
 
+  private void logout() {
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      builder.setTitle("Are you sure to exit the application ?");
+      builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialogInterface, int i) {
+              FirebaseAuth.getInstance().signOut();
+              startActivity(new Intent(MainActivity.this, LoginActivity.class));
+              finish();
+          }
+      });
+      builder.setNegativeButton("No", null);
+      builder.create().show();
+
+  }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_logout){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Are you sure to exit the Application ?");
-            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    FirebaseAuth.getInstance().signOut();
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    finish();
-                }
-            });
-            builder.setNegativeButton("No", null);
-            builder.create().show();
+            logout();
         }
         return super.onOptionsItemSelected(item);
     }

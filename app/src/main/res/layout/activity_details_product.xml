@@ -26,19 +26,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-    <TextView
-        android:id="@+id/detailed_price"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/alice"
-        android:text="Price : 30/kg"
-        android:textColor="@color/purple_700"
-        android:textSize="25sp"
-        android:textStyle="bold"
+        android:orientation="horizontal"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detailed_img" />
+        app:layout_constraintTop_toBottomOf="@+id/detailed_img">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/alice"
+            android:text="Price : "
+            android:textColor="@color/purple_700"
+            android:textSize="25sp"
+            android:textStyle="bold"
+             />
+        <TextView
+            android:id="@+id/detailed_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/alice"
+            android:text="30/kg"
+            android:textColor="@color/purple_700"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            />
+    </LinearLayout>
+
 
     <ImageView
         android:id="@+id/rating_img"
@@ -71,7 +88,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:textAlignment="center"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detailed_price" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout"

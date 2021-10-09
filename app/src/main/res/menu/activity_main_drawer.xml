@@ -40,5 +40,9 @@
             android:id="@+id/nav_users"
             android:icon="@drawable/ic_baseline_users"
             android:title="@string/users" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/logout"
+            android:title="@string/logout"/>
     </group>
 </menu>

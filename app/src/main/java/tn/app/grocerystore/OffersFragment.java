@@ -141,72 +141,99 @@ public class OffersFragment extends Fragment {
         list = new ArrayList<>();
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
         swipeRefreshLayout.setRefreshing(true);
-        firestore.collection("Offers").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()){
-                    for (QueryDocumentSnapshot document : task.getResult()){
-                        Offer model = document.toObject(Offer.class);
-                        try {
+        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if(user.getRole().equals("ROLE_CLIENT")){
+                            firestore.collection("Offers").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        for (QueryDocumentSnapshot document : task.getResult()){
+                                            Offer model = document.toObject(Offer.class);
+                                            try {
 
-                            String dateNow = new SimpleDateFormat("MM-dd-yyyy").format(Calendar.getInstance().getTime());
-                            Date date_now = new SimpleDateFormat("MM-dd-yyyy").parse(dateNow);
-                            Date date_debit = new SimpleDateFormat("MM-dd-yyyy").parse(model.getDate_debut());
-                            Date date_fin = new SimpleDateFormat("MM-dd-yyyy").parse(model.getDate_fin());
-                            //Toast.makeText(getActivity(), "Date now "+date_now+"\n date debit "+date_debit, Toast.LENGTH_LONG).show();
-                                database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
-                                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                User user = snapshot.getValue(User.class);
-                                                if(user.getRole().equals("ROLE_CLIENT")){
-                                                    if(date_now.after(date_debit)  && date_now.before(date_fin)){
-                                                        list.add(model);
-                                                    }
-                                                }
-                                                else {
+                                                String dateNow = new SimpleDateFormat("MM-dd-yyyy").format(Calendar.getInstance().getTime());
+                                                Date date_now = new SimpleDateFormat("MM-dd-yyyy").parse(dateNow);
+                                                Date date_debit = new SimpleDateFormat("MM-dd-yyyy").parse(model.getDate_debut());
+                                                Date date_fin = new SimpleDateFormat("MM-dd-yyyy").parse(model.getDate_fin());
+                                                //Toast.makeText(getActivity(), "Date now "+date_now+"\n date debit "+date_debit, Toast.LENGTH_LONG).show();
+                                                if(date_now.after(date_debit)  && date_now.before(date_fin)){
                                                     list.add(model);
                                                 }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-
-                                            }
-                                        });
-                           /* if(date_now.after(date_debit)  && date_now.before(date_fin)){
-                                list.add(model);
-                            }*/
 
                             /*else if(!compare_role.equals("ROLE_CLIENT")) {
                                 list.add(model);
                             } */
 
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
+                                            //list.add(model);
+                                        }
+                                        adapter = new OfferAdapter(getActivity(), list);
+                                        recyclerView.setAdapter(adapter);
+                                        adapter.notifyDataSetChanged();
+                                        swipeRefreshLayout.setRefreshing(false);
+                                    }
+                                    else {
+                                        Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
+                                        Log.w("TAG", "Error getting documents.", task.getException());
+                                        swipeRefreshLayout.setRefreshing(false);
+                                    }
+                                    if(list.size() == 0){
+                                        recyclerView.setVisibility(View.GONE);
+                                        emptyList.setVisibility(View.VISIBLE);
+                                    }
+                                    else {
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        emptyList.setVisibility(View.GONE);
+                                    }
+                                }
+                            });
                         }
-                        //list.add(model);
+                        if(user.getRole().equals("ROLE_ADMIN")){
+                            firestore.collection("Offers").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        for (QueryDocumentSnapshot document : task.getResult()){
+                                            String offerId = document.getId();
+                                            Offer model = document.toObject(Offer.class);
+                                            model.setOfferId(offerId);
+                                            list.add(model);
+                                        }
+                                        adapter = new OfferAdapter(getActivity(), list);
+                                        recyclerView.setAdapter(adapter);
+                                        adapter.notifyDataSetChanged();
+                                        swipeRefreshLayout.setRefreshing(false);
+                                    }
+                                    else {
+                                        Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
+                                        Log.w("TAG", "Error getting documents.", task.getException());
+                                        swipeRefreshLayout.setRefreshing(false);
+                                    }
+                                    if(list.size() == 0){
+                                        recyclerView.setVisibility(View.GONE);
+                                        emptyList.setVisibility(View.VISIBLE);
+                                    }
+                                    else {
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        emptyList.setVisibility(View.GONE);
+                                    }
+                                }
+                            });
+                        }
                     }
-                    adapter = new OfferAdapter(getActivity(), list);
-                    recyclerView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-                else {
-                    Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
-                    Log.w("TAG", "Error getting documents.", task.getException());
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-                if(list.size() == 0){
-                    recyclerView.setVisibility(View.GONE);
-                    emptyList.setVisibility(View.VISIBLE);
-                }
-                else {
-                    recyclerView.setVisibility(View.VISIBLE);
-                    emptyList.setVisibility(View.GONE);
-                }
-            }
-        });
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
     }
 
     private void openDialog() {
