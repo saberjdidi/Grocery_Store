@@ -1,19 +1,20 @@
-package tn.app.grocerystore.activities;
+package tn.app.grocerystore.Fragments;
+
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.app.Dialog;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -36,56 +37,45 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import tn.app.grocerystore.Fragments.NewAddressFragment;
 import tn.app.grocerystore.R;
-import tn.app.grocerystore.adapters.AddressAdapter;
-import tn.app.grocerystore.adapters.MyCartAdapter;
-import tn.app.grocerystore.adapters.UserAdapter;
+import tn.app.grocerystore.adapters.AddressListAdapter;
 import tn.app.grocerystore.models.Address;
-import tn.app.grocerystore.models.Category;
-import tn.app.grocerystore.models.MyCartModel;
 import tn.app.grocerystore.models.User;
 
-public class AddressActivity extends AppCompatActivity implements AddressAdapter.SelectedAddress {
+public class AddressFragment extends Fragment {
 
     RecyclerView recyclerView;
     SwipeRefreshLayout swipeRefreshLayout;
     FloatingActionButton fab;
     TextView emptyTv;
-    Toolbar toolbar;
-    Button continuePayment;
     List<Address> list;
-    AddressAdapter adapter;
+    AddressListAdapter adapter;
 
     FirebaseAuth auth;
     FirebaseFirestore db;
 
-    String mAddress = "";
     //add address
     Dialog dialogAddress;
     EditText nameEt, addressEt, cityEt, postalCodeEt, phoneNumberEt;
     Button addAddressBtn;
     ProgressBar progressBarDialog;
+    List<String> uid;
+    String user_uid;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_address);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_address, container, false);
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        recyclerView = findViewById(R.id.address_rec);
-        emptyTv = findViewById(R.id.emptyTv);
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
-        continuePayment = findViewById(R.id.buy_now);
-        fab = findViewById(R.id.fab);
+        recyclerView = view.findViewById(R.id.address_rec);
+        emptyTv = view.findViewById(R.id.emptyTv);
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        fab = view.findViewById(R.id.fab);
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -97,7 +87,7 @@ public class AddressActivity extends AppCompatActivity implements AddressAdapter
             }
         });
 
-        dialogAddress = new Dialog(this);
+        dialogAddress = new Dialog(getContext());
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,66 +95,68 @@ public class AddressActivity extends AppCompatActivity implements AddressAdapter
             }
         });
 
-        continuePayment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mAddress == ""){
-                    Toast.makeText(AddressActivity.this, "Please Add your Address to continue the payment", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    List<MyCartModel> listCart = (ArrayList<MyCartModel>) getIntent().getSerializableExtra("itemList");
-                    Intent intent = new Intent(AddressActivity.this, PaymentActivity.class);
-                    intent.putExtra("listCart", (Serializable) listCart);
-                    intent.putExtra("address", mAddress);
-                    startActivity(intent);
-                }
-            }
-        });
-
         loadData();
-    }
 
+        return view;
+    }
     private void loadData() {
         swipeRefreshLayout.setRefreshing(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         list = new ArrayList<>();
-        adapter = new AddressAdapter(getApplicationContext(),list, this::setAddress);
+        adapter = new AddressListAdapter(list, getActivity());
         recyclerView.setAdapter(adapter);
-        db.collection("CurrentUser").document(auth.getCurrentUser().getUid())
-                .collection("Address").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        //get users
+        uid = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    for (DocumentSnapshot ds : task.getResult().getDocuments()){
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                list.clear();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    User user = ds.getValue(User.class);
+                    //get all user except currently signed in user
+                    uid.add(user.getUid());
+                    for(String str : uid){
+                        user_uid = str;
+                        Toast.makeText(getActivity(), "Users : "+user.getUid(), Toast.LENGTH_LONG).show();
+                        db.collection("CurrentUser").document(user_uid)
+                                .collection("Address").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()){
+                                    for (DocumentSnapshot ds : task.getResult().getDocuments()){
 
-                        Address model = ds.toObject(Address.class);
-
-                        list.add(model);
-                        adapter.notifyDataSetChanged();
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                    if(list.size() == 0){
-                        recyclerView.setVisibility(View.GONE);
-                        emptyTv.setVisibility(View.VISIBLE);
-                        continuePayment.setVisibility(View.GONE);
-                        fab.setVisibility(View.VISIBLE);
-                    }
-                    else {
-                        recyclerView.setVisibility(View.VISIBLE);
-                        emptyTv.setVisibility(View.GONE);
-                        continuePayment.setVisibility(View.VISIBLE);
-                        fab.setVisibility(View.GONE);
+                                        Address model = ds.toObject(Address.class);
+                                        list.add(model);
+                                        adapter.notifyDataSetChanged();
+                                        swipeRefreshLayout.setRefreshing(false);
+                                    }
+                                    if(list.size() == 0){
+                                        recyclerView.setVisibility(View.GONE);
+                                        emptyTv.setVisibility(View.VISIBLE);
+                                        swipeRefreshLayout.setRefreshing(false);
+                                    }
+                                    else {
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        emptyTv.setVisibility(View.GONE);
+                                        swipeRefreshLayout.setRefreshing(false);
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
             }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
+
 
         swipeRefreshLayout.setRefreshing(false);
     }
 
     private void openDialog(){
-
-
         dialogAddress.setContentView(R.layout.new_address_popup);
         dialogAddress.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -220,32 +212,22 @@ public class AddressActivity extends AppCompatActivity implements AddressAdapter
                     .collection("Address").add(map).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(@NonNull DocumentReference documentReference) {
-                        Toast.makeText(AddressActivity.this, "Address added successfully", Toast.LENGTH_SHORT).show();
-                        list.add(new Address(final_address1));
-                        adapter.notifyItemInserted(list.size());
-                        dialogAddress.dismiss();
+                    Toast.makeText(getContext(), "Address added successfully", Toast.LENGTH_SHORT).show();
+                    list.add(new Address(final_address1));
+                    adapter.notifyItemInserted(list.size());
+                    dialogAddress.dismiss();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(AddressActivity.this, "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     dialogAddress.dismiss();
                 }
             });
         }
         else {
-            Toast.makeText(AddressActivity.this, "Kindly Fill All Field", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Kindly Fill All Field", Toast.LENGTH_SHORT).show();
         }
     }
 
-    @Override
-    public void setAddress(String address) {
-       mAddress = address;
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return super.onSupportNavigateUp();
-    }
 }

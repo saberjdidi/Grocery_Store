@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="tn.app.grocerystore.ui.home.HomeFragment"
+        android:name="tn.app.grocerystore.Fragments.BottomNavigationFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_bottom_navigation" />
 
     <fragment
         android:id="@+id/nav_profile"
@@ -27,6 +27,11 @@
         android:name="tn.app.grocerystore.Fragments.NewAddressFragment"
         android:label="@string/new_address"
         tools:layout="@layout/fragment_new_address" />
+    <fragment
+        android:id="@+id/nav_address_list"
+        android:name="tn.app.grocerystore.Fragments.AddressFragment"
+        android:label="@string/address"
+        tools:layout="@layout/fragment_address" />
     <fragment
         android:id="@+id/nav_offers"
         android:name="tn.app.grocerystore.OffersFragment"

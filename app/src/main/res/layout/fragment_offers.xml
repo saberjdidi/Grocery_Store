@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/emptyList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" android:visibility="gone">
+        android:layout_height="match_parent">
         <ImageView
             android:id="@+id/new_product_img"
             android:layout_width="400dp"

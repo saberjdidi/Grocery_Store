@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_category, R.id.nav_address, R.id.nav_profile, R.id.nav_offers, R.id.nav_new_product,
+                R.id.nav_home, R.id.nav_category, R.id.nav_address, R.id.nav_address_list, R.id.nav_profile, R.id.nav_offers, R.id.nav_new_product,
                 R.id.nav_my_orders, R.id.nav_my_carts, R.id.nav_users, R.id.nav_logout)
                 .setOpenableLayout(drawer)
                 .build();
@@ -89,6 +89,11 @@ public class MainActivity extends AppCompatActivity {
                         if(user.getRole().equals("ROLE_CLIENT")){
                             Menu nav_menu = navigationView.getMenu();
                             nav_menu.findItem(R.id.nav_users).setVisible(false);
+                            nav_menu.findItem(R.id.nav_address_list).setVisible(false);
+                        }
+                        else if(user.getRole().equals("ROLE_ADMIN")){
+                            Menu nav_menu = navigationView.getMenu();
+                            nav_menu.findItem(R.id.nav_address).setVisible(false);
                         }
                     }
 

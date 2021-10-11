@@ -139,6 +139,7 @@ public class OffersFragment extends Fragment {
 
     private void loadData() {
         list = new ArrayList<>();
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
         swipeRefreshLayout.setRefreshing(true);
         database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())

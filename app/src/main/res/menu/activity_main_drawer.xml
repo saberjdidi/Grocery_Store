@@ -25,6 +25,10 @@
             android:icon="@drawable/ic_baseline_add_location_24"
             android:title="@string/new_address" />
         <item
+            android:id="@+id/nav_address_list"
+            android:icon="@drawable/ic_baseline_location_on_24"
+            android:title="@string/address" />
+        <item
             android:id="@+id/nav_my_carts"
             android:icon="@drawable/mycart"
             android:title="@string/my_carts" />

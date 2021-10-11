@@ -4,6 +4,7 @@ public class User {
     String name, email, password, number, address;
     String profileImg;
     String role;
+    String uid;
 
     public User() {
     }
@@ -72,5 +73,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }
