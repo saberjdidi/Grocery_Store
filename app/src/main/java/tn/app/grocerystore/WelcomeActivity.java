@@ -9,6 +9,8 @@ import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import tn.app.grocerystore.activities.RegistrationActivity;
+
 public class WelcomeActivity extends AppCompatActivity {
 
     ProgressBar progressBar;

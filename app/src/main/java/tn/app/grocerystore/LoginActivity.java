@@ -22,14 +22,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import tn.app.grocerystore.models.User;
+import tn.app.grocerystore.activities.RegistrationActivity;
 
 public class LoginActivity extends AppCompatActivity {
 

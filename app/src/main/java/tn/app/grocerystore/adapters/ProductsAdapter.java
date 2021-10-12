@@ -1,5 +1,6 @@
 package tn.app.grocerystore.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -56,7 +57,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.MyHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyHolder holder, @SuppressLint("RecyclerView") int position) {
         Glide.with(context).load(list.get(position).getImg_url()).into(holder.image);
         holder.name.setText(list.get(position).getName());
         holder.description.setText(list.get(position).getDescription());

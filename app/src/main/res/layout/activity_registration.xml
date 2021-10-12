@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegistrationActivity"
+    tools:context=".activities.RegistrationActivity"
     android:background="@color/white">
     <ImageView
         android:id="@+id/reg_img"
@@ -65,6 +65,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/email_reg"
         app:layout_constraintWidth_percent=".8" />
+    <EditText
+        android:id="@+id/confirm_password_reg"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:drawableLeft="@drawable/keylog"
+        android:drawablePadding="10dp"
+        android:layout_marginTop="15dp"
+        android:elevation="3dp"
+        android:padding="13dp"
+        android:hint="@string/confirm_password"
+        android:inputType="textPassword"
+        android:textColor="#888887"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/password_reg"
+        app:layout_constraintWidth_percent=".8" />
 
     <EditText
         android:id="@+id/number_reg"
@@ -81,7 +98,7 @@
         android:inputType="phone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/password_reg"
+        app:layout_constraintTop_toBottomOf="@id/confirm_password_reg"
         app:layout_constraintWidth_percent=".8" />
     <EditText
         android:id="@+id/address_reg"

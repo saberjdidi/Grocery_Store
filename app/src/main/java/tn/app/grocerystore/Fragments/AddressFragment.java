@@ -117,9 +117,8 @@ public class AddressFragment extends Fragment {
                     //get all user except currently signed in user
                     uid.add(user.getUid());
                     for(String str : uid){
-                        user_uid = str;
-                        Toast.makeText(getActivity(), "Users : "+user.getUid(), Toast.LENGTH_LONG).show();
-                        db.collection("CurrentUser").document(user_uid)
+                        //Toast.makeText(getActivity(), "Users : "+user.getUid(), Toast.LENGTH_LONG).show();
+                        db.collection("CurrentUser").document(user_uid )
                                 .collection("Address").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {

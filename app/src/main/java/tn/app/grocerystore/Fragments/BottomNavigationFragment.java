@@ -28,8 +28,9 @@ public class BottomNavigationFragment extends Fragment {
 
         bnv_main = view.findViewById(R.id.bnv_main);
         bnv_main.add(new MeowBottomNavigation.Model(1, R.drawable.ic_menuhome));
-        bnv_main.add(new MeowBottomNavigation.Model(2, R.drawable.ic_information));
-        bnv_main.add(new MeowBottomNavigation.Model(3, R.drawable.ic_contact));
+        bnv_main.add(new MeowBottomNavigation.Model(2, R.drawable.autorenew));
+        bnv_main.add(new MeowBottomNavigation.Model(3, R.drawable.ic_information));
+        bnv_main.add(new MeowBottomNavigation.Model(4, R.drawable.ic_contact));
 
         bnv_main.show(1, true);
         replace(new HomeFragment());
@@ -42,10 +43,14 @@ public class BottomNavigationFragment extends Fragment {
                         break;
 
                     case 2:
-                        replace(new AboutFragment());
+                        replace(new ProductsPagingFragment());
                         break;
 
                     case 3:
+                        replace(new AboutFragment());
+                        break;
+
+                    case 4:
                         replace(new ContactFragment());
                         break;
                 }

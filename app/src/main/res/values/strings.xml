@@ -30,4 +30,5 @@
     <string name="address">Address</string>
     <string name="have_account">Already have an account ?</string>
     <string name="users">Users</string>
+    <string name="confirm_password">Confirm Password</string>
 </resources>

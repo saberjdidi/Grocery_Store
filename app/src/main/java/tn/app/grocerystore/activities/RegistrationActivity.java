@@ -1,4 +1,4 @@
-package tn.app.grocerystore;
+package tn.app.grocerystore.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,18 +29,21 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import tn.app.grocerystore.LoginActivity;
+import tn.app.grocerystore.R;
 import tn.app.grocerystore.models.User;
 
 public class RegistrationActivity extends AppCompatActivity {
 
     Button signUp;
     ImageView profileIv;
-    EditText name, email, password, number, address;
+    EditText name, email, password, confim_password, number, address;
     TextView signIn;
 
     FirebaseAuth auth;
@@ -71,6 +74,7 @@ public class RegistrationActivity extends AppCompatActivity {
         name = findViewById(R.id.name_reg);
         email = findViewById(R.id.email_reg);
         password = findViewById(R.id.password_reg);
+        confim_password = findViewById(R.id.confirm_password_reg);
         number = findViewById(R.id.number_reg);
         address = findViewById(R.id.address_reg);
         signUp = findViewById(R.id.register_btn);
@@ -102,36 +106,64 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 createUser();
-                progressBar.setVisibility(View.VISIBLE);
             }
         });
     }
 
     private void createUser() {
+        progressBar.setVisibility(View.VISIBLE);
         String userName = name.getText().toString();
         String userEmail = email.getText().toString();
         String userPassword = password.getText().toString();
+        String userConfirmPassword = confim_password.getText().toString();
         String userNumber = number.getText().toString();
         String userAddress = address.getText().toString();
 
+        if(image_uri == null){
+            Toast.makeText(RegistrationActivity.this, "Image profile is required", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if(TextUtils.isEmpty(userName)){
             name.setError("userName is required");
+            name.requestFocus();
+            progressBar.setVisibility(View.GONE);
             return;
         }
         if(TextUtils.isEmpty(userEmail)){
             email.setError("Email is required");
+            email.requestFocus();
+            progressBar.setVisibility(View.GONE);
             return;
         }
         if(TextUtils.isEmpty(userPassword)){
             password.setError("Password is required");
+            progressBar.setVisibility(View.GONE);
+            password.requestFocus();
+            return;
+        }
+        if(TextUtils.isEmpty(userConfirmPassword)){
+            confim_password.setError("Confirm Password is required");
+            progressBar.setVisibility(View.GONE);
+            confim_password.requestFocus();
+            return;
+        }
+        if(!userPassword.equals(userConfirmPassword)){
+            progressBar.setVisibility(View.GONE);
+            confim_password.setError("Password not matched");
+            confim_password.requestFocus();
+            confim_password.setText("");
             return;
         }
         if(TextUtils.isEmpty(userNumber)){
             number.setError("Phone Number is required");
+            progressBar.setVisibility(View.GONE);
+            number.requestFocus();
             return;
         }
         if(TextUtils.isEmpty(userAddress)){
             address.setError("Address is required");
+            progressBar.setVisibility(View.GONE);
+            address.requestFocus();
             return;
         }
 
@@ -152,17 +184,20 @@ public class RegistrationActivity extends AppCompatActivity {
                                      public void onSuccess(Void unused) {
                                          progressBar.setVisibility(View.GONE);
                                          Toast.makeText(RegistrationActivity.this, "Registration Successfully", Toast.LENGTH_SHORT).show();
-                                         name.setText("");
-                                         email.setText("");
-                                         password.setText("");
-                                         address.setText("");
-                                         number.setText("");
+                                         sendVerificationEmail();
                                      }
                                  }).addOnFailureListener(new OnFailureListener() {
                                      @Override
                                      public void onFailure(@NonNull Exception e) {
                                          progressBar.setVisibility(View.GONE);
-                                         Toast.makeText(RegistrationActivity.this, "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                         if(e instanceof FirebaseAuthUserCollisionException){
+                                             email.setError("Email Already Registered");
+                                             email.requestFocus();
+                                         }
+                                         else {
+
+                                             Toast.makeText(RegistrationActivity.this, "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                         }
                                      }
                                  });
                              }
@@ -174,6 +209,27 @@ public class RegistrationActivity extends AppCompatActivity {
                      }
                     }
                 });
+    }
+
+    private void sendVerificationEmail() {
+        if(auth.getCurrentUser() != null){
+            auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                 if (task.isSuccessful()){
+                     name.setText("");
+                     email.setText("");
+                     password.setText("");
+                     address.setText("");
+                     number.setText("");
+                     Toast.makeText(RegistrationActivity.this, "Mail has been sent to your email ", Toast.LENGTH_SHORT).show();
+                     startActivity(new Intent(RegistrationActivity.this, LoginActivity.class));
+                 } else{
+                     Toast.makeText(RegistrationActivity.this, "Email not found ", Toast.LENGTH_SHORT).show();
+                 }
+                }
+            });
+        }
     }
 
     //image profile methods
