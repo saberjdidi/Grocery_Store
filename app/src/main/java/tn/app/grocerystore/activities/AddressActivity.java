@@ -65,6 +65,7 @@ public class AddressActivity extends AppCompatActivity implements AddressAdapter
 
     FirebaseAuth auth;
     FirebaseFirestore db;
+    FirebaseDatabase database;
 
     String mAddress = "";
     //add address
@@ -89,6 +90,7 @@ public class AddressActivity extends AppCompatActivity implements AddressAdapter
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        database = FirebaseDatabase.getInstance();
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -176,6 +178,21 @@ public class AddressActivity extends AppCompatActivity implements AddressAdapter
         addAddressBtn = dialogAddress.findViewById(R.id.add_address_btn);
         progressBarDialog = dialogAddress.findViewById(R.id.progressbar_dialog);
         progressBarDialog.setVisibility(View.GONE);
+
+        //get phone number from database
+        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        phoneNumberEt.setText(user.getNumber());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
         addAddressBtn.setOnClickListener(new View.OnClickListener() {
             @Override

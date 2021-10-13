@@ -71,7 +71,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loginUser();
-                progressBar.setVisibility(View.VISIBLE);
             }
         });
 
@@ -95,15 +94,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser() {
+        progressBar.setVisibility(View.VISIBLE);
         String userEmail = email.getText().toString();
         String userPassword = password.getText().toString();
 
         if(TextUtils.isEmpty(userEmail)){
+            progressBar.setVisibility(View.GONE);
             email.setError("Email is required");
+            email.requestFocus();
             return;
         }
         if(TextUtils.isEmpty(userPassword)){
+            progressBar.setVisibility(View.GONE);
             password.setError("Password is required");
+            password.requestFocus();
             return;
         }
         //login user

@@ -156,7 +156,7 @@ public class ProductFragment extends Fragment {
         list = new ArrayList<>();
         swipeRefreshLayout.setRefreshing(true);
 
-        db.collection("AllProducts")
+        db.collection("AllProducts").orderBy("name")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

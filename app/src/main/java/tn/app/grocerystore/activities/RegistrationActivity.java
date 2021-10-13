@@ -119,10 +119,10 @@ public class RegistrationActivity extends AppCompatActivity {
         String userNumber = number.getText().toString();
         String userAddress = address.getText().toString();
 
-        if(image_uri == null){
+        /*if(image_uri == null){
             Toast.makeText(RegistrationActivity.this, "Image profile is required", Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
         if(TextUtils.isEmpty(userName)){
             name.setError("userName is required");
             name.requestFocus();
@@ -131,6 +131,13 @@ public class RegistrationActivity extends AppCompatActivity {
         }
         if(TextUtils.isEmpty(userEmail)){
             email.setError("Email is required");
+            email.requestFocus();
+            progressBar.setVisibility(View.GONE);
+            return;
+        }
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        if(!userEmail.matches(emailPattern)){
+            email.setError("Email not valid");
             email.requestFocus();
             progressBar.setVisibility(View.GONE);
             return;
@@ -160,6 +167,12 @@ public class RegistrationActivity extends AppCompatActivity {
             number.requestFocus();
             return;
         }
+        if(userNumber.length()>8 || userNumber.length()<8){
+            number.setError("Phone contains 8 number");
+            progressBar.setVisibility(View.GONE);
+            number.requestFocus();
+            return;
+        }
         if(TextUtils.isEmpty(userAddress)){
             address.setError("Address is required");
             progressBar.setVisibility(View.GONE);
@@ -173,35 +186,65 @@ public class RegistrationActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                      if(task.isSuccessful()){
-                         StorageReference ref = FirebaseStorage.getInstance().getReference().child("profile_picture").child(FirebaseAuth.getInstance().getUid());
-                         ref.putFile(image_uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                             @Override
-                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                 User user = new User(userName, userEmail, userPassword, userNumber, userAddress, image_uri.toString(), "ROLE_CLIENT");
-                                 String id = task.getResult().getUser().getUid();
-                                 database.getReference().child("Users").child(id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                     @Override
-                                     public void onSuccess(Void unused) {
-                                         progressBar.setVisibility(View.GONE);
-                                         Toast.makeText(RegistrationActivity.this, "Registration Successfully", Toast.LENGTH_SHORT).show();
-                                         sendVerificationEmail();
-                                     }
-                                 }).addOnFailureListener(new OnFailureListener() {
-                                     @Override
-                                     public void onFailure(@NonNull Exception e) {
-                                         progressBar.setVisibility(View.GONE);
-                                         if(e instanceof FirebaseAuthUserCollisionException){
-                                             email.setError("Email Already Registered");
-                                             email.requestFocus();
+                         if(image_uri != null){
+                             //image profile not null
+                             StorageReference ref = FirebaseStorage.getInstance().getReference().child("profile_picture").child(FirebaseAuth.getInstance().getUid());
+                             ref.putFile(image_uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                 @Override
+                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                     User user = new User(userName, userEmail, userPassword, userNumber, userAddress, image_uri.toString(), "ROLE_CLIENT");
+                                     String id = task.getResult().getUser().getUid();
+                                     database.getReference().child("Users").child(id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                         @Override
+                                         public void onSuccess(Void unused) {
+                                             progressBar.setVisibility(View.GONE);
+                                             Toast.makeText(RegistrationActivity.this, "Registration Successfully", Toast.LENGTH_SHORT).show();
+                                             sendVerificationEmail();
                                          }
-                                         else {
+                                     }).addOnFailureListener(new OnFailureListener() {
+                                         @Override
+                                         public void onFailure(@NonNull Exception e) {
+                                             progressBar.setVisibility(View.GONE);
+                                             if(e instanceof FirebaseAuthUserCollisionException){
+                                                 email.setError("Email Already Registered");
+                                                 email.requestFocus();
+                                             }
+                                             else {
 
-                                             Toast.makeText(RegistrationActivity.this, "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                 Toast.makeText(RegistrationActivity.this, "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                             }
                                          }
+                                     });
+                                 }
+                             });
+                         }
+                         else {
+                             //image profile null
+                             User user = new User(userName, userEmail, userPassword, userNumber, userAddress, null, "ROLE_CLIENT");
+                             String id = task.getResult().getUser().getUid();
+                             database.getReference().child("Users").child(id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                 @Override
+                                 public void onSuccess(Void unused) {
+                                     progressBar.setVisibility(View.GONE);
+                                     Toast.makeText(RegistrationActivity.this, "Registration Successfully", Toast.LENGTH_SHORT).show();
+                                     sendVerificationEmail();
+                                 }
+                             }).addOnFailureListener(new OnFailureListener() {
+                                 @Override
+                                 public void onFailure(@NonNull Exception e) {
+                                     progressBar.setVisibility(View.GONE);
+                                     if(e instanceof FirebaseAuthUserCollisionException){
+                                         email.setError("Email Already Registered");
+                                         email.requestFocus();
                                      }
-                                 });
-                             }
-                         });
+                                     else {
+
+                                         Toast.makeText(RegistrationActivity.this, "Error "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                     }
+                                 }
+                             });
+                         }
+
                      }
                      else {
                          progressBar.setVisibility(View.GONE);

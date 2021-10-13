@@ -106,7 +106,7 @@ public class AddressFragment extends Fragment {
         adapter = new AddressListAdapter(list, getActivity());
         recyclerView.setAdapter(adapter);
         //get users
-        uid = new ArrayList<>();
+      /*  uid = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -117,7 +117,8 @@ public class AddressFragment extends Fragment {
                     //get all user except currently signed in user
                     uid.add(user.getUid());
                     for(String str : uid){
-                        //Toast.makeText(getActivity(), "Users : "+user.getUid(), Toast.LENGTH_LONG).show();
+                        user_uid = str;
+                        Toast.makeText(getActivity(), "Users : "+user_uid, Toast.LENGTH_LONG).show();
                         db.collection("CurrentUser").document(user_uid )
                                 .collection("Address").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
@@ -149,8 +150,32 @@ public class AddressFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
-        });
+        }); */
+        db.collection("CurrentUser").document(auth.getUid() )
+                .collection("Address").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    for (DocumentSnapshot ds : task.getResult().getDocuments()){
 
+                        Address model = ds.toObject(Address.class);
+                        list.add(model);
+                        adapter.notifyDataSetChanged();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    if(list.size() == 0){
+                        recyclerView.setVisibility(View.GONE);
+                        emptyTv.setVisibility(View.VISIBLE);
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    else {
+                        recyclerView.setVisibility(View.VISIBLE);
+                        emptyTv.setVisibility(View.GONE);
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+            }
+        });
 
         swipeRefreshLayout.setRefreshing(false);
     }

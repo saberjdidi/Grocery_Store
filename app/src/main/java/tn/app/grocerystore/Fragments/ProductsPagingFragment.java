@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,17 +27,23 @@ import com.firebase.ui.firestore.SnapshotParser;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
 import com.firebase.ui.firestore.paging.LoadingState;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import tn.app.grocerystore.R;
 import tn.app.grocerystore.activities.DetailsProductActivity;
+import tn.app.grocerystore.adapters.ProductsAdapter;
 import tn.app.grocerystore.models.ViewAllModel;
 
 public class ProductsPagingFragment extends Fragment {
@@ -46,9 +53,16 @@ public class ProductsPagingFragment extends Fragment {
     List<ViewAllModel> list;
     TextView emptyTv;
     FirestorePagingAdapter adapter;
+    ProductsAdapter productsAdapter;
+
 
     FirebaseAuth auth;
     FirebaseFirestore firestore;
+    DocumentSnapshot lastVisible;
+
+    LinearLayoutManager linearLayoutManager;
+    boolean isScrolling;
+    boolean isLastItemReached;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,6 +77,8 @@ public class ProductsPagingFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
 
+        linearLayoutManager = new LinearLayoutManager(getContext());
+
         loadData();
 
         return view;
@@ -70,8 +86,105 @@ public class ProductsPagingFragment extends Fragment {
 
     private void loadData() {
         swipeRefreshLayout.setRefreshing(true);
+        list = new ArrayList<>();
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
         //Query
-        Query query = firestore.collection("AllProducts");
+        Query query = firestore.collection("AllProducts").orderBy("name", Query.Direction.ASCENDING).limit(5);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()){
+                    for (DocumentSnapshot ds : task.getResult()){
+                        ViewAllModel model = ds.toObject(ViewAllModel.class);
+                        list.add(model);
+                    }
+                    productsAdapter = new ProductsAdapter(getContext(), list);
+                    recyclerView.setAdapter(productsAdapter);
+                    if(list.size() == 0){
+                        recyclerView.setVisibility(View.GONE);
+                        emptyTv.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        recyclerView.setVisibility(View.VISIBLE);
+                        emptyTv.setVisibility(View.GONE);
+                    }
+                    // Get the last visible document
+                    lastVisible = task.getResult().getDocuments()
+                            .get(task.getResult().size() -1);
+                    Toast.makeText(getContext(), "First page loaded", Toast.LENGTH_SHORT).show();
+
+                    RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+                        @Override
+                        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                            super.onScrollStateChanged(recyclerView, newState);
+
+                            if(newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
+                                isScrolling = true;
+                            }
+                        }
+
+                        @Override
+                        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                            super.onScrolled(recyclerView, dx, dy);
+
+                            int firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+                            int visibleItemCount = linearLayoutManager.getChildCount();
+                            int totalItemCount = linearLayoutManager.getItemCount();
+
+                            if(isScrolling && (firstVisibleItem + visibleItemCount == totalItemCount) && !isLastItemReached ){
+                                isScrolling = false;
+                                Query nextQuery = firestore.collection("AllProducts")
+                                        .orderBy("name", Query.Direction.ASCENDING)
+                                        .startAfter(lastVisible)
+                                        .limit(5);
+                                nextQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        for (DocumentSnapshot ds : task.getResult()){
+                                            ViewAllModel model = ds.toObject(ViewAllModel.class);
+                                            list.add(model);
+                                        }
+                                        productsAdapter.notifyDataSetChanged();
+
+                                        lastVisible = task.getResult().getDocuments()
+                                                .get(task.getResult().size() -1);
+                                        Toast.makeText(getContext(), "Next page loaded", Toast.LENGTH_SHORT).show();
+
+                                        if (task.getResult().size() < 5){
+                                            isLastItemReached = true;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    };
+                    recyclerView.addOnScrollListener(onScrollListener);
+                }
+            }
+        });
+       /* query.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot documentSnapshots) {
+                        // ...
+
+                        // Get the last visible document
+                        DocumentSnapshot lastVisible = documentSnapshots.getDocuments()
+                                .get(documentSnapshots.size() -1);
+
+                        // Construct a new query starting at this document,
+                        // get the next 25 cities.
+                        Query next = firestore.collection("AllProducts")
+                                .orderBy("name")
+                                .startAfter(lastVisible)
+                                .limit(25);
+
+                        // Use the query for pagination
+                        // ...
+                    }
+                });
+
 
         PagedList.Config config = new PagedList.Config.Builder()
                 .setInitialLoadSizeHint(10)
@@ -110,14 +223,6 @@ public class ProductsPagingFragment extends Fragment {
                 holder.description.setText(model.getDescription());
                 holder.price.setText(String.format("%d$",model.getPrice()));
                 holder.rating.setText(model.getRating());
-               /* holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), DetailsProductActivity.class);
-                        intent.putExtra("detail", list.get(position));
-                        getActivity().startActivity(intent);
-                    }
-                }); */
             }
 
             @Override
@@ -142,10 +247,8 @@ public class ProductsPagingFragment extends Fragment {
                 }
             }
         };
-
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged(); */
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -162,7 +265,7 @@ public class ProductsPagingFragment extends Fragment {
         }
     }
 
-    @Override
+  /*  @Override
     public void onStart() {
         super.onStart();
         adapter.startListening();
@@ -172,5 +275,5 @@ public class ProductsPagingFragment extends Fragment {
     public void onStop() {
         super.onStop();
         adapter.stopListening();
-    }
+    }*/
 }
