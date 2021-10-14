@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -68,6 +69,9 @@ public class CategoryFragment extends Fragment {
     ProgressBar progressBar, progressBarDialog;
     FloatingActionButton fab;
     TextView emptyTv;
+    SearchView searchView;
+    FloatingActionMenu floatingActionMenu;
+    com.github.clans.fab.FloatingActionButton fabBtnAdd, fabBtnSearch;
 
     FirebaseStorage storage;
     FirebaseAuth auth;
@@ -98,6 +102,11 @@ public class CategoryFragment extends Fragment {
         progressBar = root.findViewById(R.id.progressbar);
         fab = root.findViewById(R.id.fab);
         emptyTv = root.findViewById(R.id.emptyTv);
+        searchView = root.findViewById(R.id.search_view);
+        searchView.setVisibility(View.GONE);
+        floatingActionMenu = root.findViewById(R.id.menu);
+        fabBtnAdd = root.findViewById(R.id.menu_button1);
+        fabBtnSearch = root.findViewById(R.id.menu_button2);
 
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -112,6 +121,7 @@ public class CategoryFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                searchView.setVisibility(View.GONE);
                 loadData();
             }
         });
@@ -123,6 +133,7 @@ public class CategoryFragment extends Fragment {
                         User user = snapshot.getValue(User.class);
                         if(user.getRole().equals("ROLE_CLIENT")){
                             fab.setVisibility(View.GONE);
+                            fabBtnAdd.setVisibility(View.GONE);
                         }
                     }
 
@@ -136,6 +147,39 @@ public class CategoryFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 openDialog();
+            }
+        });
+        fabBtnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openDialog();
+            }
+        });
+        fabBtnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchView.setVisibility(View.VISIBLE);
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        if(!TextUtils.isEmpty(query.trim())){
+                            searchData(query);
+                        } else {
+                            loadData();
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String query) {
+                        if(!TextUtils.isEmpty(query.trim())){
+                            searchData(query);
+                        } else {
+                            loadData();
+                        }
+                        return false;
+                    }
+                });
             }
         });
 
@@ -365,48 +409,5 @@ public class CategoryFragment extends Fragment {
             categoryImg.setImageURI(image_uri);
 
         }
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true); //to show menu option in fragment
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        //inflater menu
-        inflater.inflate(R.menu.main, menu);
-        //menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_logout).setVisible(false);
-        //searchView
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                //called when user press search button from keybord
-                if(!TextUtils.isEmpty(query.trim())){
-                    searchData(query);
-                } else {
-                    loadData();
-                }
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                //called when user change text in searchView
-                if(!TextUtils.isEmpty(query.trim())){
-                    searchData(query);
-                } else {
-                    loadData();
-                }
-                return false;
-            }
-        });
-
-        super.onCreateOptionsMenu(menu, inflater);
     }
 }

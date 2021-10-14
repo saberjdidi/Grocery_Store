@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -77,6 +78,10 @@ public class ProductFragment extends Fragment {
     FloatingActionButton fab;
     ProgressBar progressBarDialog;
     TextView emptyTv;
+    SearchView searchView;
+
+    FloatingActionMenu floatingActionMenu;
+    com.github.clans.fab.FloatingActionButton fabBtnAdd, fabBtnSearch;
 
     FirebaseStorage storage;
     FirebaseAuth auth;
@@ -107,6 +112,12 @@ public class ProductFragment extends Fragment {
         recyclerView = view.findViewById(R.id.product_rec);
         fab = view.findViewById(R.id.fab);
         emptyTv = view.findViewById(R.id.emptyTv);
+        searchView = view.findViewById(R.id.search_view);
+        searchView.setVisibility(View.GONE);
+
+        floatingActionMenu = view.findViewById(R.id.menu);
+        fabBtnAdd = view.findViewById(R.id.menu_button1);
+        fabBtnSearch = view.findViewById(R.id.menu_button2);
 
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -119,6 +130,7 @@ public class ProductFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                searchView.setVisibility(View.GONE);
                 loadData();
             }
         });
@@ -130,6 +142,7 @@ public class ProductFragment extends Fragment {
                         User user = snapshot.getValue(User.class);
                         if(user.getRole().equals("ROLE_CLIENT")){
                             fab.setVisibility(View.GONE);
+                            fabBtnAdd.setVisibility(View.GONE);
                         }
                     }
 
@@ -142,6 +155,39 @@ public class ProductFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 openDialog();
+            }
+        });
+        fabBtnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openDialog();
+            }
+        });
+        fabBtnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                searchView.setVisibility(View.VISIBLE);
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        if(!TextUtils.isEmpty(query.trim())){
+                            searchData(query);
+                        } else {
+                            loadData();
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String query) {
+                        if(!TextUtils.isEmpty(query.trim())){
+                            searchData(query);
+                        } else {
+                            loadData();
+                        }
+                        return false;
+                    }
+                });
             }
         });
 
