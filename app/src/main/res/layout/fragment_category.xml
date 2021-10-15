@@ -131,7 +131,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add"
             fab:fab_size="mini"
-            fab:fab_label="New Product" />
+            fab:fab_label="New Category" />
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/menu_button2"
             android:layout_width="wrap_content"

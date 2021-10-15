@@ -34,6 +34,7 @@ import com.firebase.ui.firestore.SnapshotParser;
 import com.firebase.ui.firestore.paging.FirestorePagingAdapter;
 import com.firebase.ui.firestore.paging.FirestorePagingOptions;
 import com.firebase.ui.firestore.paging.LoadingState;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -63,6 +64,10 @@ public class ProductsPagingFragment extends Fragment {
     TextView emptyTv;
     FirestorePagingAdapter adapter;
     ProductsAdapter productsAdapter;
+    SearchView searchView;
+
+    FloatingActionMenu floatingActionMenu;
+    com.github.clans.fab.FloatingActionButton fabBtnSearch;
 
 
     FirebaseAuth auth;
@@ -82,6 +87,11 @@ public class ProductsPagingFragment extends Fragment {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
         recyclerView = view.findViewById(R.id.product_rec);
         emptyTv = view.findViewById(R.id.emptyTv);
+        searchView = view.findViewById(R.id.search_view);
+        searchView.setVisibility(View.GONE);
+
+        floatingActionMenu = view.findViewById(R.id.menu);
+        fabBtnSearch = view.findViewById(R.id.menu_button2);
 
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
@@ -93,6 +103,38 @@ public class ProductsPagingFragment extends Fragment {
             @Override
             public void onRefresh() {
                 loadData();
+            }
+        });
+        fabBtnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(searchView.getVisibility() == View.GONE){
+                    searchView.setVisibility(View.VISIBLE);
+                    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            if(!TextUtils.isEmpty(query.trim())){
+                                searchData(query);
+                            } else {
+                                loadData();
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String query) {
+                            if(!TextUtils.isEmpty(query.trim())){
+                                searchData(query);
+                            } else {
+                                loadData();
+                            }
+                            return false;
+                        }
+                    });
+                } else {
+                    searchView.setVisibility(View.GONE);
+                    loadData();
+                }
             }
         });
 
@@ -274,47 +316,5 @@ public class ProductsPagingFragment extends Fragment {
             }
         });
         swipeRefreshLayout.setRefreshing(false);
-    }
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-      setHasOptionsMenu(true); //to show menu option in fragment
-      super.onCreate(savedInstanceState);
-  }
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        //inflater menu
-        inflater.inflate(R.menu.main, menu);
-        //menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_logout).setVisible(false);
-        //searchView
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                //called when user press search button from keybord
-                if(!TextUtils.isEmpty(query.trim())){
-                    searchData(query);
-                } else {
-                    loadData();
-                }
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                //called when user change text in searchView
-                if(!TextUtils.isEmpty(query.trim())){
-                    searchData(query);
-                } else {
-                    loadData();
-                }
-                return false;
-            }
-        });
-
-        super.onCreateOptionsMenu(menu, inflater);
     }
 }

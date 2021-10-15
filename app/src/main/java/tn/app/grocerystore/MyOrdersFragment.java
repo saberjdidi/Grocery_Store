@@ -17,6 +17,10 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -28,11 +32,13 @@ import tn.app.grocerystore.adapters.MyCartAdapter;
 import tn.app.grocerystore.adapters.OrderAdapter;
 import tn.app.grocerystore.models.MyCartModel;
 import tn.app.grocerystore.models.OrderModel;
+import tn.app.grocerystore.models.User;
 
 public class MyOrdersFragment extends Fragment {
 
     FirebaseFirestore db;
     FirebaseAuth auth;
+    FirebaseDatabase database;
 
     SwipeRefreshLayout swipeRefreshLayout;
     RecyclerView recyclerView;
@@ -53,6 +59,7 @@ public class MyOrdersFragment extends Fragment {
 
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        database = FirebaseDatabase.getInstance();
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -71,30 +78,68 @@ public class MyOrdersFragment extends Fragment {
         list = new ArrayList<>();
         adapter = new OrderAdapter(getActivity(), list);
         recyclerView.setAdapter(adapter);
-        db.collection("CurrentUser").document(auth.getCurrentUser().getUid())
-                .collection("myPayments").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    for (DocumentSnapshot ds : task.getResult().getDocuments()){
+        //get user
+        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if(user.getRole().equals("ROLE_CLIENT")){
+                            db.collection("CurrentUser").document(auth.getCurrentUser().getUid())
+                                    .collection("myPayments").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()){
+                                        for (DocumentSnapshot ds : task.getResult().getDocuments()){
 
-                        OrderModel model = ds.toObject(OrderModel.class);
+                                            OrderModel model = ds.toObject(OrderModel.class);
 
-                        list.add(model);
-                        adapter.notifyDataSetChanged();
-                        swipeRefreshLayout.setRefreshing(false);
+                                            list.add(model);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                        if(list.size() == 0){
+                                            recyclerView.setVisibility(View.GONE);
+                                            emptyTv.setVisibility(View.VISIBLE);
+                                        }
+                                        else {
+                                            recyclerView.setVisibility(View.VISIBLE);
+                                            emptyTv.setVisibility(View.GONE);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        else if(user.getRole().equals("ROLE_ADMIN")){
+                            db.collection("Commandes").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()){
+                                        for (DocumentSnapshot ds : task.getResult().getDocuments()){
+
+                                            OrderModel model = ds.toObject(OrderModel.class);
+
+                                            list.add(model);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                        if(list.size() == 0){
+                                            recyclerView.setVisibility(View.GONE);
+                                            emptyTv.setVisibility(View.VISIBLE);
+                                        }
+                                        else {
+                                            recyclerView.setVisibility(View.VISIBLE);
+                                            emptyTv.setVisibility(View.GONE);
+                                        }
+                                    }
+                                }
+                            });
+                        }
                     }
-                    if(list.size() == 0){
-                        recyclerView.setVisibility(View.GONE);
-                        emptyTv.setVisibility(View.VISIBLE);
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
-                    else {
-                        recyclerView.setVisibility(View.VISIBLE);
-                        emptyTv.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
+                });
         swipeRefreshLayout.setRefreshing(false);
     }
 }

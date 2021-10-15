@@ -57,8 +57,10 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import tn.app.grocerystore.R;
 import tn.app.grocerystore.adapters.NavCategoryAdapter;
+import tn.app.grocerystore.adapters.ProductsAdapter;
 import tn.app.grocerystore.models.Category;
 import tn.app.grocerystore.models.User;
+import tn.app.grocerystore.models.ViewAllModel;
 
 public class CategoryFragment extends Fragment {
 
@@ -79,7 +81,7 @@ public class CategoryFragment extends Fragment {
     FirebaseDatabase database;
 
     //add category
-    Dialog dialogCategory;
+    Dialog dialogCategory, dialogSearch;
     CircleImageView categoryImg;
     EditText nameEt, descriptionEt, discountEt;
     Spinner typeEt;
@@ -89,6 +91,12 @@ public class CategoryFragment extends Fragment {
 
     String[] typeList = {"fruit", "egg", "proteine"};
     ArrayAdapter<String> adapterType;
+
+    //search product
+    EditText search_nameEt, search_descriptionEt;
+    Button search_dialog_btn;
+    String nameSearch = "";
+    String descriptionSearch = "";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -117,6 +125,7 @@ public class CategoryFragment extends Fragment {
         recyclerView.setVisibility(View.GONE);
 
         dialogCategory = new Dialog(getContext());
+        dialogSearch = new Dialog(getContext());
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -158,28 +167,7 @@ public class CategoryFragment extends Fragment {
         fabBtnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchView.setVisibility(View.VISIBLE);
-                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        if(!TextUtils.isEmpty(query.trim())){
-                            searchData(query);
-                        } else {
-                            loadData();
-                        }
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String query) {
-                        if(!TextUtils.isEmpty(query.trim())){
-                            searchData(query);
-                        } else {
-                            loadData();
-                        }
-                        return false;
-                    }
-                });
+                openDialogSearch();
             }
         });
 
@@ -236,7 +224,7 @@ public class CategoryFragment extends Fragment {
                 });
     }
 
-    private void searchData(String query) {
+    private void searchData(String query_name, String query_description) {
         //Popular items
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
         list = new ArrayList<>();
@@ -253,8 +241,106 @@ public class CategoryFragment extends Fragment {
 
                                 Category model = document.toObject(Category.class);
                                 model.setCategoryId(categoryId);
-                                if(model.getName().toLowerCase().contains(query.toLowerCase()) ||
-                                   model.getDescription().toLowerCase().contains(query.toLowerCase())){
+                                if(model.getName().toLowerCase().contains(query_name.toLowerCase()) ||
+                                        model.getDescription().toLowerCase().contains(query_description.toLowerCase())){
+                                    list.add(model);
+                                }
+
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
+                            }
+
+                            adapter = new NavCategoryAdapter(getActivity(), list);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
+                        } else {
+                            Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                            progressBar.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+    private void searchName(String query_name) {
+        //Popular items
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        list = new ArrayList<>();
+        swipeRefreshLayout.setRefreshing(true);
+
+        db.collection("NavCategory")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String categoryId = document.getId();
+
+                                Category model = document.toObject(Category.class);
+                                model.setCategoryId(categoryId);
+                                if(model.getName().toLowerCase().contains(query_name.toLowerCase())){
+                                    list.add(model);
+                                }
+
+                                progressBar.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
+                            }
+
+                            adapter = new NavCategoryAdapter(getActivity(), list);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
+                        } else {
+                            Toast.makeText(getActivity(), "Error "+task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                            progressBar.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+    private void searchDescription(String query_description) {
+        //Popular items
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        list = new ArrayList<>();
+        swipeRefreshLayout.setRefreshing(true);
+
+        db.collection("NavCategory")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String categoryId = document.getId();
+
+                                Category model = document.toObject(Category.class);
+                                model.setCategoryId(categoryId);
+                                if(model.getDescription().toLowerCase().contains(query_description.toLowerCase())){
                                     list.add(model);
                                 }
 
@@ -398,6 +484,42 @@ public class CategoryFragment extends Fragment {
                 });
             }
         });
+    }
+
+    private void openDialogSearch() {
+
+
+        dialogSearch.setContentView(R.layout.search_popup);
+        dialogSearch.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        search_nameEt = dialogSearch.findViewById(R.id.search_name);
+        search_descriptionEt = dialogSearch.findViewById(R.id.search_description);
+        search_dialog_btn = dialogSearch.findViewById(R.id.search_btn);
+
+        search_dialog_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nameSearch = search_nameEt.getText().toString();
+                descriptionSearch = search_descriptionEt.getText().toString();
+                dialogSearch.dismiss();
+
+                if(!TextUtils.isEmpty(nameSearch) && !TextUtils.isEmpty(descriptionSearch)){
+                    searchData(nameSearch, descriptionSearch);
+                }
+                else if(!TextUtils.isEmpty(nameSearch) && TextUtils.isEmpty(descriptionSearch)){
+                    searchName(nameSearch);
+                }
+                else if(TextUtils.isEmpty(nameSearch) && !TextUtils.isEmpty(descriptionSearch)){
+                    searchDescription(descriptionSearch);
+                }
+                else {
+                    loadData();
+                }
+                Toast.makeText(getContext(), nameSearch, Toast.LENGTH_SHORT).show();
+            }
+        });
+        dialogSearch.show();
     }
 
     @Override

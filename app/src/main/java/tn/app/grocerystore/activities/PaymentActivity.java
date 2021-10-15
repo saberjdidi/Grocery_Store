@@ -184,7 +184,17 @@ public class PaymentActivity extends AppCompatActivity implements PaymentResultL
                             Toast.makeText(PaymentActivity.this, "Error : "+e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-
+            firestore.collection("Commandes").add(hashMap)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(@NonNull DocumentReference documentReference) {
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                        }
+                    });
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,8 @@
 package tn.app.grocerystore.ui.profile;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,6 +35,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -113,44 +117,54 @@ public class ProfileFragment extends Fragment {
         String numberEt = number.getText().toString();
         String addressEt = address.getText().toString();
 
+        //image deleted, upload new image
+        final String timeStamp = String.valueOf(System.currentTimeMillis());
+        String filePathAndName = "Posts/" + "post_" + timeStamp;
+        //get image from imageview
+        Bitmap bitmap = ((BitmapDrawable)profileImg.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //image compress
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,baos);
+        byte[] data = baos.toByteArray(); //convert image to byte
+
         final StorageReference reference = storage.getReference().child("profile_picture")
                 .child(FirebaseAuth.getInstance().getUid());
 
-        reference.putFile(image_uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        reference.putBytes(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(getContext(), "Uploaded", Toast.LENGTH_SHORT).show();
+                //image uploaded to firebase storage, now get's url
+                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                while (!uriTask.isSuccessful());
+                String downloadUri = uriTask.getResult().toString();
 
-                reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        image_uri = uri;
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("name", nameEt);
-                        hashMap.put("email", emailEt);
-                        hashMap.put("profileImg", image_uri.toString());
-                        hashMap.put("number", numberEt);
-                        hashMap.put("address", addressEt);
-                        hashMap.put("role", "ROLE_CLIENT");
-                        hashMap.put("uid", auth.getCurrentUser().getUid());
-                        //DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-                        //reference.child(FirebaseAuth.getInstance().getUid()).updateChildren(hashMap)
-                        database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid()).setValue(hashMap)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(getContext(), "User updated", Toast.LENGTH_SHORT).show();
-                                        Log.d("TAG", "Hash Map "+hashMap);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(getContext(), "Error : "+e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    }
-                });
+                if(uriTask.isSuccessful()){
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put("name", nameEt);
+                    hashMap.put("email", emailEt);
+                    hashMap.put("profileImg", downloadUri);
+                    hashMap.put("number", numberEt);
+                    hashMap.put("address", addressEt);
+                    hashMap.put("role", "ROLE_CLIENT");
+                    hashMap.put("uid", auth.getCurrentUser().getUid());
+                    //DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+                    //reference.child(FirebaseAuth.getInstance().getUid()).updateChildren(hashMap)
+                    database.getReference().child("Users").child(FirebaseAuth.getInstance().getUid()).setValue(hashMap)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(getContext(), "User updated", Toast.LENGTH_SHORT).show();
+                                    Log.d("TAG", "Hash Map "+hashMap);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getContext(), "Error : "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
             }
         });
 

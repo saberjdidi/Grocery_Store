@@ -9,10 +9,6 @@
             android:icon="@drawable/ic_menuhome"
             android:title="@string/menu_home" />
         <item
-            android:id="@+id/nav_profile"
-            android:icon="@drawable/menu_person"
-            android:title="@string/profile" />
-        <item
             android:id="@+id/nav_category"
             android:icon="@drawable/ic_baseline_category_24"
             android:title="@string/category" />
@@ -44,9 +40,22 @@
             android:id="@+id/nav_users"
             android:icon="@drawable/ic_baseline_users"
             android:title="@string/users" />
-        <item
-            android:id="@+id/nav_logout"
-            android:icon="@drawable/logout"
-            android:title="@string/logout"/>
     </group>
+    <item android:id="@+id/nav_account"
+        android:title="@string/menu_account">
+        <menu>
+            <!--<item-->
+            <!--android:id="@+id/nav_settings"-->
+            <!--android:icon="@drawable/ic_menu_settings"-->
+            <!--android:title="@string/menu_settings" />-->
+            <item
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/menu_person"
+                android:title="@string/profile" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/logout"
+                android:title="@string/logout"/>
+        </menu>
+    </item>
 </menu>

@@ -2,9 +2,7 @@ package tn.app.grocerystore.Fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -34,7 +32,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.Glide;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -89,7 +86,7 @@ public class ProductFragment extends Fragment {
     FirebaseDatabase database;
 
     //add product
-    Dialog dialogProduct;
+    Dialog dialogProduct, dialogSearch;
     MyDialog dialogListCategory;
     CircleImageView productImg;
     EditText nameEt, descriptionEt, ratingEt, priceEt, cat_search;
@@ -101,6 +98,12 @@ public class ProductFragment extends Fragment {
     ArrayAdapter<String> adapterType;
     List<String> category;
     String nameCat;
+
+    //search product
+    EditText search_nameEt, search_descriptionEt;
+    Button search_dialog_btn;
+    String nameSearch = "";
+    String descriptionSearch = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -125,6 +128,7 @@ public class ProductFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
 
         dialogProduct = new Dialog(getContext());
+        dialogSearch = new Dialog(getContext());
         dialogListCategory = new MyDialog(getContext());
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -166,28 +170,34 @@ public class ProductFragment extends Fragment {
         fabBtnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchView.setVisibility(View.VISIBLE);
-                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String query) {
-                        if(!TextUtils.isEmpty(query.trim())){
-                            searchData(query);
-                        } else {
-                            loadData();
+                openDialogSearch();
+               /* if(searchView.getVisibility() == View.GONE){
+                    searchView.setVisibility(View.VISIBLE);
+                    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            if(!TextUtils.isEmpty(query.trim())){
+                                searchData(query);
+                            } else {
+                                loadData();
+                            }
+                            return false;
                         }
-                        return false;
-                    }
 
-                    @Override
-                    public boolean onQueryTextChange(String query) {
-                        if(!TextUtils.isEmpty(query.trim())){
-                            searchData(query);
-                        } else {
-                            loadData();
+                        @Override
+                        public boolean onQueryTextChange(String query) {
+                            if(!TextUtils.isEmpty(query.trim())){
+                                searchData(query);
+                            } else {
+                                loadData();
+                            }
+                            return false;
                         }
-                        return false;
-                    }
-                });
+                    });
+                } else {
+                    searchView.setVisibility(View.GONE);
+                    loadData();
+                } */
             }
         });
 
@@ -213,6 +223,135 @@ public class ProductFragment extends Fragment {
                                 ViewAllModel model = document.toObject(ViewAllModel.class);
                                 model.setProductId(productId);
                                 list.add(model);
+                            }
+
+                            adapter = new ProductsAdapter(getActivity(), list);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
+                        } else {
+                            Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+
+
+    private void searchData(String query_name, String query_description) {
+        swipeRefreshLayout.setRefreshing(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        list = new ArrayList<>();
+
+        db.collection("AllProducts")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String productId = document.getId();
+                                ViewAllModel model = document.toObject(ViewAllModel.class);
+                                model.setProductId(productId);
+
+                                if(model.getName().toLowerCase().contains(query_name.toLowerCase()) ||
+                                        model.getDescription().toLowerCase().contains(query_description.toLowerCase())){
+                                    list.add(model);
+                                }
+
+                            }
+
+                            adapter = new ProductsAdapter(getActivity(), list);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
+                        } else {
+                            Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+    private void searchName(String query_name) {
+        swipeRefreshLayout.setRefreshing(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        list = new ArrayList<>();
+
+        db.collection("AllProducts")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String productId = document.getId();
+                                ViewAllModel model = document.toObject(ViewAllModel.class);
+                                model.setProductId(productId);
+
+                                if(model.getName().toLowerCase().contains(query_name.toLowerCase())){
+                                    list.add(model);
+                                }
+
+                            }
+
+                            adapter = new ProductsAdapter(getActivity(), list);
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
+                            swipeRefreshLayout.setRefreshing(false);
+                        } else {
+                            Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
+                            Log.w("TAG", "Error getting documents.", task.getException());
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        if(list.size() == 0){
+                            recyclerView.setVisibility(View.GONE);
+                            emptyTv.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            recyclerView.setVisibility(View.VISIBLE);
+                            emptyTv.setVisibility(View.GONE);
+                        }
+                    }
+                });
+    }
+    private void searchDescription(String query_description) {
+        swipeRefreshLayout.setRefreshing(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        list = new ArrayList<>();
+
+        db.collection("AllProducts")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String productId = document.getId();
+                                ViewAllModel model = document.toObject(ViewAllModel.class);
+                                model.setProductId(productId);
+
+                                if(model.getDescription().toLowerCase().contains(query_description.toLowerCase())){
+                                    list.add(model);
+                                }
+
                             }
 
                             adapter = new ProductsAdapter(getActivity(), list);
@@ -303,6 +442,42 @@ public class ProductFragment extends Fragment {
             cat_search.setText(nameCat);
         });
 
+    }
+
+    private void openDialogSearch() {
+
+
+        dialogSearch.setContentView(R.layout.search_popup);
+        dialogSearch.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+
+        search_nameEt = dialogSearch.findViewById(R.id.search_name);
+        search_descriptionEt = dialogSearch.findViewById(R.id.search_description);
+        search_dialog_btn = dialogSearch.findViewById(R.id.search_btn);
+
+        search_dialog_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nameSearch = search_nameEt.getText().toString();
+                descriptionSearch = search_descriptionEt.getText().toString();
+                dialogSearch.dismiss();
+
+                if(!TextUtils.isEmpty(nameSearch) && !TextUtils.isEmpty(descriptionSearch)){
+                    searchData(nameSearch, descriptionSearch);
+                }
+                else if(!TextUtils.isEmpty(nameSearch) && TextUtils.isEmpty(descriptionSearch)){
+                    searchName(nameSearch);
+                }
+                else if(TextUtils.isEmpty(nameSearch) && !TextUtils.isEmpty(descriptionSearch)){
+                    searchDescription(descriptionSearch);
+                }
+                else {
+                    loadData();
+                }
+                Toast.makeText(getContext(), nameSearch, Toast.LENGTH_SHORT).show();
+            }
+        });
+        dialogSearch.show();
     }
 
     private void addProduct() {
@@ -419,49 +594,6 @@ public class ProductFragment extends Fragment {
         }
     }
 
-    private void searchData(final String query) {
-        swipeRefreshLayout.setRefreshing(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
-        list = new ArrayList<>();
-
-        db.collection("AllProducts")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String productId = document.getId();
-                                ViewAllModel model = document.toObject(ViewAllModel.class);
-                                model.setProductId(productId);
-
-                                if(model.getName().toLowerCase().contains(query.toLowerCase()) ||
-                                   model.getDescription().toLowerCase().contains(query.toLowerCase())){
-                                    list.add(model);
-                                }
-                            }
-
-                            adapter = new ProductsAdapter(getActivity(), list);
-                            recyclerView.setAdapter(adapter);
-                            adapter.notifyDataSetChanged();
-                            swipeRefreshLayout.setRefreshing(false);
-                        } else {
-                            Toast.makeText(getActivity(), "Error " + task.getException(), Toast.LENGTH_SHORT).show();
-                            Log.w("TAG", "Error getting documents.", task.getException());
-                            swipeRefreshLayout.setRefreshing(false);
-                        }
-                        if(list.size() == 0){
-                            recyclerView.setVisibility(View.GONE);
-                            emptyTv.setVisibility(View.VISIBLE);
-                        }
-                        else {
-                            recyclerView.setVisibility(View.VISIBLE);
-                            emptyTv.setVisibility(View.GONE);
-                        }
-                    }
-                });
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true); //to show menu option in fragment
@@ -483,7 +615,7 @@ public class ProductFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 //called when user press search button from keybord
                 if(!TextUtils.isEmpty(query.trim())){
-                    searchData(query);
+                    ///searchData(query);
                 } else {
                     loadData();
                 }
@@ -494,7 +626,7 @@ public class ProductFragment extends Fragment {
             public boolean onQueryTextChange(String query) {
                 //called when user change text in searchView
                 if(!TextUtils.isEmpty(query.trim())){
-                    searchData(query);
+                    ///searchData(query);
                 } else {
                     loadData();
                 }
