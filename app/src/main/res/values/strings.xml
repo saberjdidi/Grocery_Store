@@ -32,4 +32,6 @@
     <string name="users">Users</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="menu_account">Account</string>
+    <string name="shopping">See your cart to complete the selling</string>
+    <string name="forget_password">Forget Password</string>
 </resources>

@@ -33,4 +33,6 @@
     <string name="users">Utilisateurs</string>
     <string name="confirm_password">Confirmer mot de passe</string>
     <string name="menu_account">Compte</string>
+    <string name="shopping">Consultez votre Chariots pour finaliser la vente</string>
+    <string name="forget_password">Mot de passe oublié</string>
 </resources>

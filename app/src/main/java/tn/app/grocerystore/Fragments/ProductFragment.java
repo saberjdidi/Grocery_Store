@@ -596,7 +596,7 @@ public class ProductFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true); //to show menu option in fragment
+        setHasOptionsMenu(false); //to show menu option in fragment
         super.onCreate(savedInstanceState);
     }
 
@@ -605,9 +605,9 @@ public class ProductFragment extends Fragment {
         //inflater menu
         inflater.inflate(R.menu.main, menu);
         //menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_logout).setVisible(false);
+       // menu.findItem(R.id.action_logout).setVisible(false);
         //searchView
-        MenuItem item = menu.findItem(R.id.action_search);
+       /* MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -632,7 +632,7 @@ public class ProductFragment extends Fragment {
                 }
                 return false;
             }
-        });
+        }); */
 
         super.onCreateOptionsMenu(menu, inflater);
     }

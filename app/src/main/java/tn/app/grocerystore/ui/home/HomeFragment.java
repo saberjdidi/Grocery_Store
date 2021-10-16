@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,11 +41,13 @@ import java.util.List;
 import tn.app.grocerystore.LoginActivity;
 import tn.app.grocerystore.R;
 import tn.app.grocerystore.adapters.HomeCategoryAdapters;
+import tn.app.grocerystore.adapters.MyCartAdapter;
 import tn.app.grocerystore.adapters.PopularAdapters;
 import tn.app.grocerystore.adapters.RecommendedAdapter;
 import tn.app.grocerystore.adapters.SliderAdapter;
 import tn.app.grocerystore.adapters.ViewAllAdapter;
 import tn.app.grocerystore.models.Category;
+import tn.app.grocerystore.models.MyCartModel;
 import tn.app.grocerystore.models.PopularModel;
 import tn.app.grocerystore.models.ViewAllModel;
 
@@ -54,6 +57,7 @@ public class HomeFragment extends Fragment {
     ProgressBar progressBar;
 
     FirebaseFirestore db;
+    FirebaseAuth auth;
 
     RecyclerView popularRec, homeCatRec, recommemdedRec;
     SliderView sliderView;
@@ -79,6 +83,10 @@ public class HomeFragment extends Fragment {
     RecyclerView recyclerViewSearch;
     ViewAllAdapter viewAllAdapter;
 
+    //total quantity
+    List<MyCartModel> listCart;
+    int totalQuantity = 0;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -92,6 +100,7 @@ public class HomeFragment extends Fragment {
         sliderView = root.findViewById(R.id.slider);
 
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
          progressBar.setVisibility(View.VISIBLE);
          scrollView.setVisibility(View.GONE);
@@ -267,7 +276,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(false); //to show menu option in fragment
+        setHasOptionsMenu(true); //to show menu option in fragment
         super.onCreate(savedInstanceState);
     }
     @Override
@@ -275,10 +284,48 @@ public class HomeFragment extends Fragment {
         //inflater menu
         inflater.inflate(R.menu.main, menu);
         //hide addpost icon from this fragment
-        menu.findItem(R.id.action_search).setVisible(false);
-        menu.findItem(R.id.action_logout).setVisible(true);
+        //menu.findItem(R.id.action_search).setVisible(false);
+        //menu.findItem(R.id.action_logout).setVisible(true);
+        MenuItem menuItem = menu.findItem(R.id.action_shopping);
+        View actionView = menuItem.getActionView();
+
+        listCart = new ArrayList<>();
+        db.collection("CurrentUser").document(auth.getCurrentUser().getUid())
+                .collection("AddToCart").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    for (DocumentSnapshot ds : task.getResult().getDocuments()){
+
+                        MyCartModel model = ds.toObject(MyCartModel.class);
+                        listCart.add(model);
+                        int qty = Integer.parseInt(model.getTotalQuantity());
+                        totalQuantity += qty;
+
+
+                    }
+                    TextView cartBadgeTextView = actionView.findViewById(R.id.cart_badge_text_view);
+                    cartBadgeTextView.setText(String.valueOf(totalQuantity));
+                    cartBadgeTextView.setVisibility(totalQuantity == 0 ? View.GONE : View.VISIBLE);
+                }
+            }
+        });
+
+
+
+        actionView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), R.string.shopping, Toast.LENGTH_SHORT).show();
+                onOptionsItemSelected(menuItem);
+            }
+        });
 
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 }

@@ -146,14 +146,14 @@ public class MainActivity extends AppCompatActivity {
 
   }
 
-    @Override
+   /* @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_logout){
             logout();
         }
         return super.onOptionsItemSelected(item);
-    }
+    } */
 
     @Override
     public boolean onSupportNavigateUp() {

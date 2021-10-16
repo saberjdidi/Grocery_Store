@@ -4,23 +4,29 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,9 +40,10 @@ public class LoginActivity extends AppCompatActivity {
 
     Button signIn;
     EditText email, password;
-    TextView signUp;
+    TextView signUp, forgetPasswordEt;
     CircleImageView fab;
     ProgressBar progressBar;
+    ProgressDialog progressDialog;
 
     FirebaseAuth auth;
 
@@ -57,13 +64,23 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.password_login);
         signIn = findViewById(R.id.login_btn);
         signUp = findViewById(R.id.sign_up);
+        forgetPasswordEt = findViewById(R.id.forget_password);
         progressBar = findViewById(R.id.progressbar);
         progressBar.setVisibility(View.GONE);
+
+        progressDialog = new ProgressDialog(this);
 
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
+            }
+        });
+        //forgot password
+        forgetPasswordEt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showrecoverPasswordDialog();
             }
         });
 
@@ -127,6 +144,75 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    //method for forget password
+    private void showrecoverPasswordDialog() {
+        //alert dialog
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Recover Password");
+
+        //set layout linear layout
+        LinearLayout linearLayout = new LinearLayout(this);
+        //views to set in dialog
+        final EditText emailEt = new EditText(this);
+        emailEt.setHint("Email");
+        emailEt.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        //set the min width of EditView
+        emailEt.setMinEms(16);
+
+        linearLayout.addView(emailEt);
+        linearLayout.setPadding(10, 10, 10, 10);
+
+        dialog.setView(linearLayout);
+
+
+        //button recover
+        dialog.setPositiveButton("Recover", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //input email
+                String email = emailEt.getText().toString().trim();
+                beginRecovery(email);
+            }
+        });
+        //button cancel
+        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        //show dialog
+        dialog.create().show();
+    }
+
+    //forget password
+    private void beginRecovery(String email) {
+        progressDialog.setMessage("Sending email...");
+        progressDialog.show();
+        auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        progressDialog.dismiss();
+                        if(task.isSuccessful()){
+                            Toast.makeText(LoginActivity.this, "Email sent",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                progressDialog.dismiss();
+                Toast.makeText(LoginActivity.this, ""+e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     //multi langage

@@ -6,6 +6,7 @@
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/account.xml" value="0.3769230769230769" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/add_circle.xml" value="0.3" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/arrow.xml" value="0.35333333333333333" />
+        <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/badge_shape.xml" value="0.24583333333333332" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/border.xml" value="0.36203703703703705" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/border_langage.xml" value="0.2875" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/btn_bg_detailed.xml" value="0.3769230769230769" />
@@ -14,6 +15,7 @@
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/ic_baseline_local_offer_24.xml" value="0.35333333333333333" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/ic_baseline_location_on_24.xml" value="0.271875" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.35" />
+        <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/ic_baseline_shopping_cart_24.xml" value="0.3769230769230769" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/ic_baseline_users.xml" value="0.3177083333333333" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/ic_code.xml" value="0.10277777777777777" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/drawable/ic_menu_camera.xml" value="0.3494791666666667" />
@@ -33,6 +35,7 @@
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/address_item.xml" value="0.27239583333333334" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/address_list_item.xml" value="0.2557291666666667" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/app_bar_main.xml" value="0.2682291666666667" />
+        <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/cart_action_item.xml" value="0.5" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/contact_item.xml" value="0.32864583333333336" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/content_main.xml" value="0.2957427536231884" />
         <entry key="..\:/Users/Xamarin/AndroidStudioProjects/GroceryStore/app/src/main/res/layout/dialog_category_list_popup.xml" value="0.36666666666666664" />
